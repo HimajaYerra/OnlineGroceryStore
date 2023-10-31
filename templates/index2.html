@@ -22,7 +22,7 @@ Sample Clothing Store - Home
                   <div class="card-body">
                     <form action="/buy/" methods="POST">
                         <h5 class="card-title">{{products[i]["category"].capitalize()}}</h5>
-                      <img src="/static/img/{{products[i]["product_image"]}}" class="shirt" alt="" />
+                      <img src="/static/img/{{products[i]["product_image"]}}" class="product" alt="" />
                       <h5 class="card-text">{{products[i]["product_name"]}}</h5>
                       {% if products[i]["onSale"] %}
                         <img src="/static/img/sale-icon.png" width="26px" />

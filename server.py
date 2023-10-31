@@ -25,7 +25,7 @@ try:
         port = 27017,
         serverSelectionTimeoutMS = 1000
     )
-    db = mongo.groceryStore #connect to assgn
+    db = mongo.onlinegrocerystore #connect to assgn
     mongo.server_info() #trigger exception if cannot connect to db
 except:
     print("Error -connect to db")
@@ -81,7 +81,7 @@ def index():
     return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 
-
+########################################################################################################
 @app.route('/old')
 def login_old():
   url=requests.get('https://dog.ceo/api/breeds/image/random')
@@ -103,7 +103,6 @@ def login1(): #when users entry username and password
   url=requests.get('https://dog.ceo/api/breeds/image/random')
   image=json.loads(url.text)
   return render_template('login.html',imagefile=image['message'])
-
 
 @app.route('/signup')
 def signup():
