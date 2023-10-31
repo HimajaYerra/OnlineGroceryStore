@@ -55,6 +55,7 @@ def logged():
         #session['uid'] = rows[0]["_id"]
     # Redirect to Home Page
     if 'user' in session:
+        print("line 58")
         return redirect ( "/shop" )
     # If username is not in the database return the log in page
     return render_template ( "login.html", msg="Wrong username or password." )
