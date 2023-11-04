@@ -19,6 +19,8 @@ try:
 except Exception as e:
     print(e)'''
 
+shoppingHash = {}
+
 try:
     mongo = pymongo.MongoClient(
         host = 'localhost',
@@ -50,6 +52,7 @@ def logged():
     print(rows)
     # If username and password match a record in database, set session variables
     if len(rows) == 1:
+        session['uid'] = rows[0]['uid']
         session['user'] = user
         session['time'] = datetime.now()
         #session['uid'] = rows[0]["_id"]
@@ -65,20 +68,16 @@ def logged():
 @app.route("/shop")
 def index():
     products = list(db.products.find({}))
-    #print(len(products),"***********")
-    #shirts = db.execute("SELECT * FROM shirts ORDER BY onSalePrice")
     productsLen = len(products)
-    # Initialize variables
     shoppingCart = []
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
     shopLen = len(shoppingCart)
+    print("here", shoppingCart, shoppingHash)
     totItems, total, display = 0, 0, 0
-        #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
-        #shopLen = len(shoppingCart)
-        #for i in range(shopLen):
-            #total += shoppingCart[i]["SUM(subTotal)"]
-            #totItems += shoppingCart[i]["SUM(qty)"]
-   
-    #return render_template ("index.html", shoppingCart=shoppingCart, shirts=products, shopLen=shopLen, shirtsLen=productsLen, total=total, totItems=totItems, display=display )
+    for i in range(shopLen):
+       total += shoppingCart[i]["subTotal"]
+       totItems += shoppingCart[i]["qty"]
     return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 @app.route("/update/")
@@ -100,9 +99,9 @@ def update():
         # Check if shirt is on sale to determine price
         for g in goods:
           item = {}
-          price= g[0]["price"]
-          item["samplename"] = g[0]["product_name"]
-          item["image"] = g[0]["product_image"]
+          price= g["price"]
+          item["samplename"] = g["product_name"]
+          item["image"] = g["product_image"]
           item["subTotal"] = qty * price
           item["qty"] = qty
           shoppingCart.append(item)
@@ -120,32 +119,47 @@ def update():
 @app.route("/buy/")
 def buy():
     # Initialize shopping cart variables
-    shoppingCart = []
-    shopLen = len(shoppingCart)
     totItems, total, display = 0, 0, 0
     qty = int(request.args.get('quantity'))
+    sampleNameIdxMap = {}
     if session:
-        # Store id of the selected shirt
-        id = int(request.args.get('id'))
-        # Select info of selected shirt from database
-        #goods = db.execute("SELECT * FROM shirts WHERE id = :id", id=id)
-        goods = list(db.products.find({"product_id":id}))
+        uid = session['uid']
+        shoppingCart = []
+        if uid not in shoppingHash:
+           shoppingHash[uid] = [] 
+        else:
+           shoppingCart = shoppingHash[uid]
+        for idx, item in enumerate(shoppingCart):
+            sampleNameIdxMap[item["samplename"]] = idx
+
+
+        productId = int(request.args.get('id'))
+        goods = list(db.products.find({"product_id":productId}))
         # Extract values from selected shirt record
         # Check if shirt is on sale to determine price
         for g in goods:
-          item = {}
-          price= g[0]["price"]
-          item["samplename"] = g[0]["product_name"]
-          item["image"] = g[0]["product_image"]
-          item["subTotal"] = qty * price
-          item["qty"] = qty
-          shoppingCart.append(item)
+            item = {}
+            price= g["price"]
+            item["samplename"] = g["product_name"]
+            item["image"] = g["product_image"]
+            item["item_id"] = productId
+            item["price"] = price 
+            if item["samplename"] in sampleNameIdxMap:
+               shoppingCart[sampleNameIdxMap[item["samplename"]]]["subTotal"] += qty * price
+               shoppingCart[sampleNameIdxMap[item["samplename"]]]["qty"] += qty
+            else:
+                item["subTotal"] = qty * price
+                item["qty"] = qty
+                shoppingCart.append(item)
+        
+        shoppingHash[uid] = shoppingCart
+        print(shoppingHash[uid])
         
         # Insert selected shirt into shopping cart
         #db.execute("INSERT INTO cart (id, qty, samplename, image, price, subTotal) VALUES (:id, :qty, :samplename, :image, :price, :subTotal)", id=id, qty=qty, samplename=samplename, image=image, price=price, subTotal=subTotal)
         #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
-        shopLen = len(shoppingCart)
         # Rebuild shopping cart
+        shopLen = len(shoppingCart)
         for i in range(shopLen):
             total += shoppingCart[i]["subTotal"]
             totItems += shoppingCart[i]["qty"]
@@ -153,8 +167,10 @@ def buy():
         #shirts = db.execute("SELECT * FROM shirts ORDER BY samplename ASC")
         products = list(db.products.find({}))
         shirtsLen = len(products)
+        print("buy", shoppingCart)
         # Go back to home page
-        return render_template ("index2.html", shoppingCart=shoppingCart, shirts=products, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display, session=session )
+        #return render_template ("index2.html", shoppingCart=shoppingCart, shirts=products, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display, session=session )
+        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display )
 
 @app.route("/filter/")
 def filter():
@@ -192,16 +208,52 @@ def filter():
 def checkout():
     #order = db.execute("SELECT * from cart") we have to have this as a global object and fetch from there
     # Update purchase history of current customer
-    order = []
-    for item in order:
-        db.execute("INSERT INTO purchases (uid, id, samplename, image, quantity) VALUES(:uid, :id, :samplename, :image, :quantity)", uid=session["uid"], id=item["id"], samplename=item["samplename"], image=item["image"], quantity=item["qty"] )
-    # Clear shopping cart
-    db.execute("DELETE from cart")
     shoppingCart = []
-    shopLen = len(shoppingCart)
-    totItems, total, display = 0, 0, 0
-    # Redirect to home page
-    return redirect('/')
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
+
+    if len(shoppingCart) > 0:
+        existingOrders = list(db.orders.find())
+        numExistingOrders = len(existingOrders)
+        order = {}
+        order["order_id"] = numExistingOrders + 1
+        order["order_items"] = []
+        order["order_total"] = 0 
+        for item in shoppingCart:
+            order["order_items"].append({"item_id": item["item_id"], "item_qty": item["qty"], "item_price": item["price"]})
+            order["order_total"] += item["subTotal"]
+        order["order_date"] = datetime.now()
+        order["ordered_by"] = session["uid"]
+        order["order_delivery_type"] = "delivery"
+        order["payment_method"] = "card"
+        order["payment_id"] = 1
+        order["delivery_address"] = {"line1": "llll", "city": "cccc", "state": "ssss", "postcode": 64085}
+        order["order_status"] = 1
+
+        try:
+            ret = db.orders.insert_one(order)
+            if not ret["acknowledged"]:
+                print("Error: Failed to insert into orders collection")
+        except:
+            print("Error: Exception caught when trying to insert in to orders collection")
+
+        # clear shopping hash
+        if session and "uid" in session and session["uid"] in shoppingHash:
+            del shoppingHash[session["uid"]]
+        return redirect('/shop')
+
+
+ 
+    #order = []
+    #for item in order:
+    #    db.execute("INSERT INTO purchases (uid, id, samplename, image, quantity) VALUES(:uid, :id, :samplename, :image, :quantity)", uid=session["uid"], id=item["id"], samplename=item["samplename"], image=item["image"], quantity=item["qty"] )
+    ## Clear shopping cart
+    #db.execute("DELETE from cart")
+    #shoppingCart = []
+    #shopLen = len(shoppingCart)
+    #totItems, total, display = 0, 0, 0
+    ## Redirect to home page
+    #return redirect('/')
 
 @app.route("/remove/", methods=["GET"])
 def remove():
@@ -222,6 +274,32 @@ def remove():
     # Render shopping cart
     return render_template ("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session )
 
+@app.route("/cart/")
+def cart():
+    if 'user' in session:
+        # Clear shopping cart variables
+        totItems, total, display = 0, 0, 0
+        shoppingCart = []
+        shopLen = len(shoppingCart)
+        # Grab info currently in database
+        #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
+        # Get variable values
+        #shopLen = len(shoppingCart)
+        #for i in range(shopLen):
+        #    total += shoppingCart[i]["SUM(subTotal)"]
+        #    totItems += shoppingCart[i]["SUM(qty)"]
+    # Render shopping cart
+    return render_template("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session)
+
+@app.route("/logout/")
+def logout():
+    # clear shopping hash
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       del shoppingHash[session["uid"]]
+    # Forget any user_id
+    session.clear()
+    # Redirect user to login form
+    return redirect("/")
 
 ########################################################################################################
 @app.route('/old')

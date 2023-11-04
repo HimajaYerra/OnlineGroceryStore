@@ -41,7 +41,7 @@ Sample Clothing Store - Home
                         <td>{{ shoppingCart[i]["product_name"] }}</td>
                         <td><form action="/update/">
                             <input type="hidden" name="id" value="{{shoppingCart[i]["product_id"]}}" />
-                            <input type="number" name="quantity" min="1" max="10" size="5" value="{{ shoppingCart[i]['SUM(qty)'] }}">
+                            <input type="number" name="quantity" min="1" max="10" size="5" value="{{ shoppingCart[i]["qty"] }}">
                             <button type="submit" class="btn btn-warning checkout">Update</button>
                           </form></td>
                         <td>{{ '${:,.2f}'.format(shoppingCart[i]["price"]) }}</td>
