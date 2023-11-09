@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}
+Sample Clothing Store - Home
+{% endblock %}
+
+{% block body %}
+<!-- Main Store Body -->
+    {% if session['user'] %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+            <strong>Welcome, {{ session['user'] }}</strong> Hope you have a pleasant experience shopping with us.
+        </div>
+
+    {% endif %}
+    <form action="/payment" method="POST">
+    <h3>Order summary</h3>
+    <div id="shoppingCart">
+      <div class="container">
+          <div class="row">
+            <div class="col-sm">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Unit Price</th>
+                    <th scope="col">Sub-Total</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                <!-- For Each shirt -->
+                {% if shopLen != 0 %}
+                {% for i in range(shopLen) %}
+                  <tr>
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td><img src="/static/img/{{ shoppingCart[i]["image"] }}" width="30px" alt="{{ shoppingCart[i]["samplename"] }}" /></td>
+                    <td>{{ shoppingCart[i]["samplename"] }}</td>
+                    <td>{{ shoppingCart[i]["qty"] }}</td>
+                    <td>{{ '${:,.2f}'.format(shoppingCart[i]["price"]) }}</td>
+                    <td>{{ '${:,.2f}'.format(shoppingCart[i]["subTotal"]) }}</td><!--
+                    <td>
+                      <form action="/remove/" methods="GET">
+                        <input type="hidden" name="id" value="{{ shoppingCart[i]["id"] }}" />
+                        <button type="submit" class="btn btn-secondary btn-sm" id="removeFromCart">Remove</button>
+                      </form>
+                    </td>-->
+                  </tr>
+                </tbody>
+                {% endfor %}
+                <tfoot>
+                  <tr>
+                    <td colSpan="7">Total: {{ '${:,.2f}'.format(total) }}<br /><br />
+                      <div class="modal-footer">
+                        <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
+                        <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+                {% else %}
+                  <tr>
+                    <td colSpan="7"><h3>Your cart is empty :\</h3></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="7">Get some shirts now!<br />
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Continue Shopping</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+                {% endif %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Delivery details</h3>
+      <input type="text" name="address1" placeholder="Address line 1" />
+      <input type="text" name="address2" placeholder="Address line 2" />
+      <input type="text" name="city" placeholder="City" />
+      <input type="text" name="state" placeholder="State" />
+      <input type="text" name="zip" placeholder="Zipcode" />
+      <button type="submit" class="btn btn-secondary btn-sm" id="removeFromCart">Remove</button>
+
+      <div class="row" id="order">
+        <h2>Buy for {{total}}</h2>
+          <input type="text" name="user_id" value="{{session["uid"]}}"/>
+          <button type="submit">Proceed to payment</button>
+      </div>
+      </form>
+    </div>
+  </main>
+
+{% endblock %}

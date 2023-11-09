@@ -1,4 +1,6 @@
+import os
 from datetime import datetime
+import stripe
 from flask import Flask, Response, redirect, render_template, request, flash , session
 import requests, json
 import sqlite3
@@ -8,6 +10,12 @@ import pymongo
 
 app=Flask(__name__)
 app.secret_key=secrets.token_urlsafe(32)
+stripe_keys = {
+   'secret_key': os.getenv("STRIPE_SECRET_KEY"),
+   'publishable_key': os.getenv("STRIPE_PUBLISHABLE_KEY")
+}
+stripe.api_key = stripe_keys['secret_key']
+
 #cursor=conn.cursor()
 '''uri = "mongodb+srv://<username>:<password>@grocerystoredb.hkslphq.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
@@ -20,6 +28,7 @@ except Exception as e:
     print(e)'''
 
 shoppingHash = {}
+orderHash = {}
 
 try:
     mongo = pymongo.MongoClient(
@@ -213,36 +222,42 @@ def checkout():
        shoppingCart = shoppingHash[session["uid"]]
 
     if len(shoppingCart) > 0:
-        existingOrders = list(db.orders.find())
-        numExistingOrders = len(existingOrders)
-        order = {}
-        order["order_id"] = numExistingOrders + 1
-        order["order_items"] = []
-        order["order_total"] = 0 
+        total = 0
+        totItems = 0
         for item in shoppingCart:
-            order["order_items"].append({"item_id": item["item_id"], "item_qty": item["qty"], "item_price": item["price"]})
-            order["order_total"] += item["subTotal"]
-        order["order_date"] = datetime.now()
-        order["ordered_by"] = session["uid"]
-        order["order_delivery_type"] = "delivery"
-        order["payment_method"] = "card"
-        order["payment_id"] = 1
-        order["delivery_address"] = {"line1": "llll", "city": "cccc", "state": "ssss", "postcode": 64085}
-        order["order_status"] = 1
+           total += item["subTotal"]
+           totItems += item["qty"]
 
-        try:
-            ret = db.orders.insert_one(order)
-            if not ret["acknowledged"]:
-                print("Error: Failed to insert into orders collection")
-        except:
-            print("Error: Exception caught when trying to insert in to orders collection")
+        #existingOrders = list(db.orders.find())
+        #numExistingOrders = len(existingOrders)
+        #order = {}
+        #order["order_id"] = numExistingOrders + 1
+        #order["order_items"] = []
+        #order["order_total"] = 0 
+        #for item in shoppingCart:
+        #    order["order_items"].append({"item_id": item["item_id"], "item_qty": item["qty"], "item_price": item["price"]})
+        #    totItems += item["qty"]
+        #    order["order_total"] += item["subTotal"]
+        #order["order_date"] = datetime.now()
+        #order["ordered_by"] = session["uid"]
+        #order["order_delivery_type"] = "delivery"
+        #order["payment_method"] = "card"
+        #order["payment_id"] = 1
+        #order["delivery_address"] = {"line1": "llll", "city": "cccc", "state": "ssss", "postcode": 64085}
+        #order["order_status"] = 1
+
+        #try:
+        #    ret = db.orders.insert_one(order)
+        #    if not ret["acknowledged"]:
+        #        print("Error: Failed to insert into orders collection")
+        #except:
+        #    print("Error: Exception caught when trying to insert in to orders collection")
 
         # clear shopping hash
-        if session and "uid" in session and session["uid"] in shoppingHash:
-            del shoppingHash[session["uid"]]
-        return redirect('/shop')
-
-
+        #if session and "uid" in session and session["uid"] in shoppingHash:
+        #    del shoppingHash[session["uid"]]
+        return render_template("checkout.html", shoppingCart=shoppingCart, shopLen=len(shoppingCart), total=total, totItems=totItems, key=stripe_keys["publishable_key"], session = session)
+    return redirect('/shop')
  
     #order = []
     #for item in order:
@@ -300,6 +315,98 @@ def logout():
     session.clear()
     # Redirect user to login form
     return redirect("/")
+
+@app.route("/order/success", methods=["GET"])
+def order_success():
+    uid = int(request.args.get('uid'))
+    order = {}
+    if uid in orderHash:
+        order = orderHash[uid]
+    # Insert the order into orders collection if payment is successful
+    try:
+        ret = db.orders.insert_one(order)
+        if not ret["acknowledged"]:
+            print("Error: Failed to insert into orders collection")
+        else:
+           del shoppingHash[uid]
+           del orderHash[uid]
+    except:
+        print("Error: Exception caught when trying to insert in to orders collection")
+    return redirect('/shop') 
+
+@app.route('/payment', methods=['POST'])
+def payment():
+    uid = int(request.form["user_id"])
+    address1 = request.form["address1"]
+    address2 = request.form["address2"]
+    city = request.form["city"]
+    state = request.form["state"]
+    zipcode = request.form["zip"]
+
+    shoppingCart = []
+    if uid in shoppingHash:
+        shoppingCart = shoppingHash[uid]
+    if len(shoppingCart) > 0:
+        itemIdToItemNameMap = {}
+
+        # Create an order
+        existingOrders = list(db.orders.find())
+        numExistingOrders = len(existingOrders)
+        order = {}
+        order["order_id"] = numExistingOrders + 1
+        order["order_items"] = []
+        order["order_total"] = 0 
+        for item in shoppingCart:
+            itemIdToItemNameMap[item["item_id"]] = item["samplename"]
+            order["order_items"].append({"item_id": item["item_id"], "item_qty": item["qty"], "item_price": item["price"]})
+            order["order_total"] += item["subTotal"]
+        order["order_date"] = datetime.now()
+        order["ordered_by"] = session["uid"]
+        order["order_delivery_type"] = "delivery"
+        order["payment_method"] = "card"
+        order["payment_id"] = 1
+        order["delivery_address"] = {"line1": address1, "city": city, "state": state, "postcode": zipcode}
+        order["order_status"] = 1
+
+        # Make a stripe payment
+        stripeItems = []
+        for item in order["order_items"]:
+           stripeItems.append({"price_data": {"currency": "usd", "product_data": {"name": itemIdToItemNameMap[item["item_id"]]}, "unit_amount": item["item_price"]*100}, "quantity": item["item_qty"]})
+        
+        orderHash[uid] = order
+
+        stripeSession = stripe.checkout.Session.create(
+            #line_items=[
+            #   {
+            #    'price_data': {
+            #        'currency': 'usd',
+            #        'product_data': {
+            #            'name': 'T-shirt',
+            #        },
+            #        'unit_amount': 2000,
+            #    },
+            #    'quantity': 1,
+            #    }
+            #],
+            line_items = stripeItems,
+            mode='payment',
+            success_url='http://localhost:5000/order/success?uid='+str(uid),
+            
+            cancel_url='http://localhost:5000/shop',
+        )
+
+        # Insert the order into orders collection if payment is successful
+        #if "paid" in stripeSession.payment_status:
+        #    try:
+        #        ret = db.orders.insert_one(order)
+        #        if not ret["acknowledged"]:
+        #            print("Error: Failed to insert into orders collection")
+        #        else:
+        #           del shoppingHash[uid]
+        #    except:
+        #        print("Error: Exception caught when trying to insert in to orders collection")
+        return redirect(stripeSession.url, code=303)
+    return redirect('/shop')
 
 ########################################################################################################
 @app.route('/old')
