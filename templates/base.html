@@ -52,9 +52,9 @@
                         <th scope="row">{{ i + 1 }}</th>
                         <td><img src="/static/img/{{ shoppingCart[i]["image"] }}" width="30px" alt="{{ shoppingCart[i]["samplename"] }}" /></td>
                         <td>{{ shoppingCart[i]["samplename"] }}</td>
-                        <td>{{ shoppingCart[i]['SUM(qty)'] }}</td>
+                        <td>{{ shoppingCart[i]["qty"] }}</td>
                         <td>{{ '${:,.2f}'.format(shoppingCart[i]["price"]) }}</td>
-                        <td>{{ '${:,.2f}'.format(shoppingCart[i]['SUM(subTotal)']) }}</td><!--
+                        <td>{{ '${:,.2f}'.format(shoppingCart[i]["subTotal"]) }}</td><!--
                         <td>
                           <form action="/remove/" methods="GET">
                             <input type="hidden" name="id" value="{{ shoppingCart[i]["id"] }}" />
