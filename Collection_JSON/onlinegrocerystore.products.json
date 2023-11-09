@@ -1,0 +1,132 @@
+[{
+  "_id": {
+    "$oid": "6522f482793ca6f8c0c090a5"
+  },
+  "product_id": 1,
+  "product_name": "bread",
+  "product_image": "bread.jpg",
+  "category": "cereals",
+  "price": 5,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "6522f494793ca6f8c0c090a6"
+  },
+  "product_id": 2,
+  "product_name": "Jalapeno",
+  "product_image": "jalapeno.jpg",
+  "category": "fresh foods",
+  "price": 6,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "654272886710cb255b2cde70"
+  },
+  "product_id": 3,
+  "product_name": "cabbage",
+  "product_image": "cabbage.jpg",
+  "category": "fresh foods",
+  "price": 2,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "65429a4b6710cb255b2cde71"
+  },
+  "product_id": 4,
+  "product_name": "Tomato",
+  "product_image": "tomato.jpg",
+  "category": "fresh foods",
+  "price": 3,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "65429aed6710cb255b2cde72"
+  },
+  "product_id": 5,
+  "product_name": "Bellpepper",
+  "product_image": "bellpepper.jpg",
+  "category": "fresh foods",
+  "price": 2,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "65429b7c6710cb255b2cde73"
+  },
+  "product_id": 6,
+  "product_name": "Cornflakes",
+  "product_image": "cornflakes.jpg",
+  "category": "cereals",
+  "price": 7,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "65429ba86710cb255b2cde74"
+  },
+  "product_id": 7,
+  "product_name": "Milk",
+  "product_image": "milk.jpg",
+  "category": "cereals",
+  "price": 3,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "65429d476710cb255b2cde75"
+  },
+  "product_id": 8,
+  "product_name": "Croissants",
+  "product_image": "croissants.jpg",
+  "category": "cereals",
+  "price": 4,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "6542a0086710cb255b2cde79"
+  },
+  "product_id": 9,
+  "product_name": "Blue Berries",
+  "product_image": "blueberries.jpg",
+  "category": "frozen",
+  "price": 8,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "6542a04f6710cb255b2cde7a"
+  },
+  "product_id": 10,
+  "product_name": "Strawberries",
+  "product_image": "strawberries.jpg",
+  "category": "frozen",
+  "price": 5,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "6542a15d6710cb255b2cde7b"
+  },
+  "product_id": 11,
+  "product_name": "Onion Rings",
+  "product_image": "onionrings.jpg",
+  "category": "snacks",
+  "price": 5,
+  "isavailable": true
+},
+{
+  "_id": {
+    "$oid": "6542a1f16710cb255b2cde7c"
+  },
+  "product_id": 12,
+  "product_name": "Chips",
+  "product_image": "chips.jpg",
+  "category": "snacks",
+  "price": 5,
+  "isavailable": true
+}]

@@ -1,0 +1,32 @@
+[{
+  "_id": {
+    "$oid": "652896ebf3d8a51dd2d0618d"
+  },
+  "category_id": 1,
+  "category_name": "cereals",
+  "isreturnable": true
+},
+{
+  "_id": {
+    "$oid": "6528970ff3d8a51dd2d0618e"
+  },
+  "category_id": 2,
+  "category_name": "fresh foods",
+  "isreturnable": false
+},
+{
+  "_id": {
+    "$oid": "65289733f3d8a51dd2d0618f"
+  },
+  "category_id": 3,
+  "category_name": "snacks",
+  "isreturnable": true
+},
+{
+  "_id": {
+    "$oid": "65289758f3d8a51dd2d06190"
+  },
+  "category_id": 4,
+  "category_name": "frozen",
+  "isreturnable": true
+}]

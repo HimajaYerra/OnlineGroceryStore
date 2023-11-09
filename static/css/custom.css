@@ -5,11 +5,11 @@
 
 .card {
     margin-bottom: 1em;
-    background-color: rgb(170, 170, 166);
+    background-color: rgb(175, 228, 162);
 }
 
 .price {
-    color: seagreen;
+    color: rgb(96, 110, 102);
     font-weight: bold;    
 }
 
