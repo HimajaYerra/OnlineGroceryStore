@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+Grocery Store - Home
+{% endblock %}
+
+{% block body %}
+<!-- Main Store Body -->
+    {% if session['user'] %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+            <strong>Welcome, {{ session['user'] }}</strong> Hope you have a pleasant experience shopping with us.
+        </div>
+
+    {% endif %}
+    <h3>Order status</h3>
+    <div id="ordersData">
+      {% for i in range(ordersLen) %}
+        <h3>Order #{{i+1}}</h3>
+        <div>
+          {% for j in range(ordersData[i]["tracking_data"]|length) %}
+          <label for="{{ordersData[i]["tracking_data"][j]["status_name"]}}">{{ordersData[i]["tracking_data"][j]["status_name"]}}</label>
+          {% if j != ordersData[i]["tracking_data"]|length - 1 %}
+          <progress id="{{ordersData[i]["tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["tracking_data"][j]["status_value"]}}</progress>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <div class="container" style="margin-bottom: 50px;">
+          <div class="row">
+            <div class="col-sm">
+              <div style="display: flex;">
+                <table class="table table-sm" style="width: 60%">
+                  <tbody>
+                    {% for j in range(ordersData[i]["orderItems"]|length) %}
+                    <tr>
+                      <td style="width: 30%;"><img src="/static/img/{{ ordersData[i]["orderItems"][j]["item_img"] }}" style="height: 100px; width: 100px;" /></td>
+                      <td>
+                          <div>{{ordersData[i]["orderItems"][j]["item_name"]}}</div>
+                          <div>Qty: {{ordersData[i]["orderItems"][j]["item_qty"]}}</div>
+                          <div>Price: {{ordersData[i]["orderItems"][j]["item_price"]}}</div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <table class="table table-sm" style="width: 40%">
+                  <tbody>
+                    <tr>
+                      <td>
+                          <div>Delivery type: {{ordersData[i]["order_delivery_type"]}}</div>
+                          <div>Payment mode: {{ordersData[i]["order_payment_method"]}}</div>
+                          <div>Order date: {{ordersData[i]["order_date"]}}</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+
+{% endblock %}

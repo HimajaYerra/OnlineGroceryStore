@@ -41,6 +41,21 @@ try:
 except:
     print("Error -connect to db")
 
+def getTrackingData(curr_status=1):
+    trackingData = [
+        {"status": 1, "status_name": "Ordered", "status_value": 0},
+        {"status": 2, "status_name": "Preparing", "status_value": 0},
+        {"status": 3, "status_name": "Shipped", "status_value": 0},
+        {"status": 4, "status_name": "Delivery", "status_value": 0},
+        {"status": 5, "status_name": "Delivered", "status_value": 0},
+    ]
+    for t in trackingData:
+        if t["status"] <= curr_status:
+            t["status_value"] = 100
+    if curr_status == len(trackingData)-1:
+        trackingData[curr_status-1]["status_value"] = 50 
+    return trackingData
+
 @app.route("/", methods=["GET"])
 def login():
     return render_template("login.html")
@@ -407,6 +422,35 @@ def payment():
         #        print("Error: Exception caught when trying to insert in to orders collection")
         return redirect(stripeSession.url, code=303)
     return redirect('/shop')
+
+@app.route('/orders/')
+def orders_history():
+    uid = None
+    ordersData = []
+    if session and "uid" in session:
+        uid = session["uid"]
+    if uid:
+        orders = list(db.orders.find({"ordered_by": uid}))
+        for order in orders:
+            orderItems = []
+            for item in order["order_items"]:
+                item_id = item["item_id"]
+                items = list(db.products.find({"product_id": item_id}))
+                item_name = items[0]["product_name"]
+                item_img = items[0]["product_image"]
+                orderItems.append({
+                   "item_id": item_id,
+                   "item_name": item_name,
+                   "item_qty": item["item_qty"],
+                   "item_price": item["item_price"],
+                   "item_img": item_img
+                })
+            order_delivery_type = order["order_delivery_type"]
+            order_payment_method = order["payment_method"]
+            order_date = order["order_date"]
+            tracking_data = getTrackingData(order["order_status"])
+            ordersData.append({"orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "tracking_data": tracking_data})
+    return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0)
 
 ########################################################################################################
 @app.route('/old')
