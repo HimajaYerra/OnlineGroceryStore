@@ -40,7 +40,7 @@ Grocery Store - Home
                       <td style="display: flex; flex-direction: column; align-items: flex-start; padding-left: 100px;">
                           <div><b>{{ordersData[i]["orderItems"][j]["item_name"]}}</b></div>
                           <div><b>Qty: </b>{{ordersData[i]["orderItems"][j]["item_qty"]}}</div>
-                          <div><b>Price: </b>${{'${:,.2f}'.format(ordersData[i]["orderItems"][j]["item_price"])}}</div>
+                          <div><b>Price: </b>{{'${:,.2f}'.format(ordersData[i]["orderItems"][j]["item_price"])}}</div>
                       </td>
                     </tr>
                     {% endfor %}
@@ -50,7 +50,7 @@ Grocery Store - Home
                   <tbody>
                     <tr>
                       <td style="display: flex; flex-direction: column; align-items: flex-start;">
-                          <div><b>Total price: </b>${{'${:,.2f}'.format(ordersData[i]["order_total"])}}</div>
+                          <div><b>Total price: </b>{{'${:,.2f}'.format(ordersData[i]["order_total"])}}</div>
                           <div><b>Delivery type: </b>{{ordersData[i]["order_delivery_type"]}}</div>
                           <div><b>Payment mode: </b>{{ordersData[i]["order_payment_method"]}}</div>
                           <div><b>Order date: </b>{{ordersData[i]["order_date"]}}</div>
