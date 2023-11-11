@@ -97,7 +97,6 @@ def index():
     if session and "uid" in session and session["uid"] in shoppingHash:
        shoppingCart = shoppingHash[session["uid"]]
     shopLen = len(shoppingCart)
-    print("here", shoppingCart, shoppingHash)
     totItems, total, display = 0, 0, 0
     for i in range(shopLen):
        total += shoppingCart[i]["subTotal"]
@@ -448,8 +447,9 @@ def orders_history():
             order_delivery_type = order["order_delivery_type"]
             order_payment_method = order["payment_method"]
             order_date = order["order_date"]
+            order_total = order["order_total"]
             tracking_data = getTrackingData(order["order_status"])
-            ordersData.append({"orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "tracking_data": tracking_data})
+            ordersData.append({"orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "tracking_data": tracking_data})
     return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0)
 
 ########################################################################################################

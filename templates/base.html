@@ -66,11 +66,16 @@
                     {% endfor %}
                     <tfoot>
                       <tr>
-                        <td colSpan="7">Total: {{ '${:,.2f}'.format(total) }}<br /><br />
-                          <div class="modal-footer">
-                            <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
-                            <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
-                            <a href="/checkout/"><button type="button" class="btn btn-success checkout">Quick Checkout</button></a>
+                        <td colSpan="6">
+                          <div class="modal-footer" style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <div>
+                              <b>Total:</b> {{ '${:,.2f}'.format(total) }}<br/>
+                            </div>
+                            <div>
+                              <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
+                              <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
+                              <a href="/checkout/"><button type="button" class="btn btn-success checkout">Checkout</button></a>
+                            </div>
                           </div>
                         </td>
                       </tr>

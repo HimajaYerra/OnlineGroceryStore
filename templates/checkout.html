@@ -51,14 +51,19 @@ Grocery Store - Home
                       </form>
                     </td>-->
                   </tr>
-                </tbody>
                 {% endfor %}
+                </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="7">Total: {{ '${:,.2f}'.format(total) }}<br /><br />
-                      <div class="modal-footer">
-                        <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
-                        <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
+                    <td colSpan="6">
+                      <div class="modal-footer" style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <div>
+                          <b>Total:</b> {{ '${:,.2f}'.format(total) }}<br/>
+                        </div>
+                        <div>
+                          <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
+                          <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -85,17 +90,16 @@ Grocery Store - Home
       </div>
 
       <h3>Delivery details</h3>
-      <input type="text" name="address1" placeholder="Address line 1" />
-      <input type="text" name="address2" placeholder="Address line 2" />
-      <input type="text" name="city" placeholder="City" />
-      <input type="text" name="state" placeholder="State" />
-      <input type="text" name="zip" placeholder="Zipcode" />
-      <button type="submit" class="btn btn-secondary btn-sm" id="removeFromCart">Remove</button>
+      <div style="display: flex; flex-direction: column; width: 300px;">
+        <input style="margin-bottom: 2.5px;" type="text" name="address1" placeholder="Address line 1" />
+        <input style="margin-bottom: 2.5px;" type="text" name="address2" placeholder="Address line 2" />
+        <input style="margin-bottom: 2.5px;" type="text" name="city" placeholder="City" />
+        <input style="margin-bottom: 2.5px;" type="text" name="state" placeholder="State" />
+        <input style="margin-bottom: 2.5px;" type="text" name="zip" placeholder="Zipcode" />
+      </div>
 
-      <div class="row" id="order">
-        <h2>Buy for {{total}}</h2>
-          <input type="text" name="user_id" value="{{session["uid"]}}"/>
-          <button type="submit">Proceed to payment</button>
+      <div id="order" style="margin-right: 63px; display: flex; justify-content: flex-end; align-items: center;">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Proceed to pay {{'${:,.2f}'.format(total)}}</button>
       </div>
       </form>
     </div>
