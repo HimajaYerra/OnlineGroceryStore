@@ -75,7 +75,7 @@ Grocery Store - Home
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="7">Get some shirts now!<br />
+                    <td colSpan="7">Get some groceries now!<br />
                       <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Continue Shopping</button>
                       </div>
@@ -86,11 +86,11 @@ Grocery Store - Home
               </table>
             </div>
           </div>
-        </div>
       </div>
 
       <h3>Delivery details</h3>
       <div style="display: flex; flex-direction: column; width: 300px;">
+        <input type="hidden" name="uid" value="{{ uid }}">
         <input style="margin-bottom: 2.5px;" type="text" name="address1" placeholder="Address line 1" />
         <input style="margin-bottom: 2.5px;" type="text" name="address2" placeholder="Address line 2" />
         <input style="margin-bottom: 2.5px;" type="text" name="city" placeholder="City" />
@@ -99,10 +99,10 @@ Grocery Store - Home
       </div>
 
       <div id="order" style="margin-right: 63px; display: flex; justify-content: flex-end; align-items: center;">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Proceed to pay {{'${:,.2f}'.format(total)}}</button>
+        <button type="submit" class="btn btn-primary" data-dismiss="modal">Proceed to pay {{'${:,.2f}'.format(total)}}</button>
       </div>
-      </form>
     </div>
+    </form>
   </main>
 
 {% endblock %}
