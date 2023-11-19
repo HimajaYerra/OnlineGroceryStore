@@ -301,30 +301,33 @@ def returns():
 
 @app.route("/update/")
 def update():
-    # Initialize shopping cart variables
+    products = list(db.products.find({}))
+    productsLen = len(products)
     shoppingCart = []
+    
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
+    
+    qty = int(request.args.get("quantity"))
+    item_id = int(request.args.get("id"))
+
+    if len(shoppingCart) > 0:
+        for item in shoppingCart:
+            if item["item_id"] == item_id:
+                item["qty"] = qty
+                item["subTotal"] = item["qty"] * item["price"]
+    
+    # Update the hash
+    if session and "uid" in session and session["uid"] in shoppingHash:
+        shoppingHash[session["uid"]] = shoppingCart
+
     shopLen = len(shoppingCart)
     totItems, total, display = 0, 0, 0
-    qty = int(request.args.get('quantity'))
-    
-    if session:
-        id = int(request.args.get('id'))
-        goods = list(db.products.find({"product_id":id}))
-        for g in goods:
-          item = {}
-          price= g["price"]
-          item["samplename"] = g["product_name"]
-          item["image"] = g["product_image"]
-          item["subTotal"] = qty * price
-          item["qty"] = qty
-          shoppingCart.append(item)
-        shopLen = len(shoppingCart)
-        # Rebuild shopping cart
-        for i in range(shopLen):
-            total += shoppingCart[i]["subTotal"]
-            totItems += shoppingCart[i]["qty"]
-        # Go back to cart page
-        return render_template ("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session )
+    for i in range(shopLen):
+       total += shoppingCart[i]["subTotal"]
+       totItems += shoppingCart[i]["qty"]
+
+    return render_template ("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session )
 
 @app.route("/buy/")
 def buy():
@@ -428,39 +431,45 @@ def checkout():
 
 @app.route("/remove/", methods=["GET"])
 def remove():
-    # Get the id of shirt selected to be removed
-    out = int(request.args.get("id"))
-    # Remove shirt from shopping cart
-    db.execute("DELETE from cart WHERE id=:id", id=out)
-    # Initialize shopping cart variables
-    totItems, total, display = 0, 0, 0
-    # Rebuild shopping cart
-    shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
+    shoppingCart = []
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
+    
+    item_id = int(request.args.get("id"))
+
+    newShoppingCart = []
+    if len(shoppingCart) > 0:
+        for item in shoppingCart:
+            if item["item_id"] != item_id:
+                newShoppingCart.append(item)
+    
+    shoppingCart = newShoppingCart
+
+    # Update the hash
+    if session and "uid" in session and session["uid"] in shoppingHash:
+        shoppingHash[session["uid"]] = shoppingCart
+    
     shopLen = len(shoppingCart)
+    totItems, total, display = 0, 0, 0
     for i in range(shopLen):
-        total += shoppingCart[i]["SUM(subTotal)"]
-        totItems += shoppingCart[i]["SUM(qty)"]
-    # Turn on "remove success" flag
-    display = 1
-    # Render shopping cart
+       total += shoppingCart[i]["subTotal"]
+       totItems += shoppingCart[i]["qty"]
+
     return render_template ("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session )
 
 @app.route("/cart/")
 def cart():
-    if 'user' in session:
-        # Clear shopping cart variables
-        totItems, total, display = 0, 0, 0
-        shoppingCart = []
-        shopLen = len(shoppingCart)
-        # Grab info currently in database
-        #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
-        # Get variable values
-        #shopLen = len(shoppingCart)
-        #for i in range(shopLen):
-        #    total += shoppingCart[i]["SUM(subTotal)"]
-        #    totItems += shoppingCart[i]["SUM(qty)"]
-    # Render shopping cart
-    return render_template("cart.html", shoppingCart=shoppingCart, shopLen=shopLen, total=total, totItems=totItems, display=display, session=session)
+    products = list(db.products.find({}))
+    productsLen = len(products)
+    shoppingCart = []
+    if session and "uid" in session and session["uid"] in shoppingHash:
+        shoppingCart = shoppingHash[session["uid"]]
+    shopLen = len(shoppingCart)
+    totItems, total, display = 0, 0, 0
+    for i in range(shopLen):
+        total += shoppingCart[i]["subTotal"]
+        totItems += shoppingCart[i]["qty"]
+    return render_template ( "cart.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 @app.route("/logout/")
 def logout():
@@ -584,6 +593,17 @@ def payment():
 
 @app.route('/orders/')
 def orders_history(user_id = None):
+    shoppingCart = []
+    
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
+    
+    shopLen = len(shoppingCart)
+    totItems, total, display = 0, 0, 0
+    for i in range(shopLen):
+       total += shoppingCart[i]["subTotal"]
+       totItems += shoppingCart[i]["qty"]
+
     uid = user_id
     ordersData = []
     if uid is None and session and "uid" in session:
@@ -624,7 +644,7 @@ def orders_history(user_id = None):
                     order_refund_amount = return_order["return_total"]
 
             ordersData.append({"order_id": order_id, "orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "order_isreturnable": order_isreturnable, "order_status": order_status, "order_return_status": order_return_status, "tracking_data": tracking_data, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
-    return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0, uid=uid)
+    return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=shopLen, shoppingCart=shoppingCart, total=total, totItems=totItems, uid=uid)
 
 ########################################################################################################
 @app.route('/old')

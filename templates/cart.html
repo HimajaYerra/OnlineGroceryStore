@@ -37,18 +37,17 @@ Grocery Store - Home
                     {% for i in range(shopLen) %}
                       <tr>
                         <th scope="row">{{ i + 1 }}</th>
-                        <td><img src="/static/img/{{ shoppingCart[i]["product_image"] }}" width="30px" alt="{{ shoppingCart[i]["samplename"] }}" /></td>
-                        <td>{{ shoppingCart[i]["product_name"] }}</td>
+                        <td><img src="/static/img/{{ shoppingCart[i]["image"] }}" width="30px" alt="{{ shoppingCart[i]["samplename"] }}" /></td>
+                        <td>{{ shoppingCart[i]["samplename"] }}</td>
                         <td><form action="/update/">
-                            <input type="hidden" name="id" value="{{shoppingCart[i]["product_id"]}}" />
+                            <input type="hidden" name="id" value="{{shoppingCart[i]["item_id"]}}" />
                             <input type="number" name="quantity" min="1" max="10" size="5" value="{{ shoppingCart[i]["qty"] }}">
                             <button type="submit" class="btn btn-warning checkout">Update</button>
                           </form></td>
                         <td>{{ '${:,.2f}'.format(shoppingCart[i]["price"]) }}</td>
-                        <td>{{ '${:,.2f}'.format(shoppingCart[i]['SUM(subTotal)']) }}</td>
                         <td>
                           <form action="/remove/" methods="GET">
-                            <input type="hidden" name="id" value="{{ shoppingCart[i]["id"] }}" />
+                            <input type="hidden" name="id" value="{{ shoppingCart[i]["item_id"] }}" />
                             <button type="submit" class="btn btn-secondary btn-sm" id="removeFromCart">Remove</button>
                           </form>
                         </td>
