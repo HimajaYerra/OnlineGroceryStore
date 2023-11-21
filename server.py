@@ -27,10 +27,46 @@ try:
         port = 27017,
         serverSelectionTimeoutMS = 1000
     )
-    db = mongo.groceryStore #connect to assgn
+    db = mongo.onlinegrocerystore #connect to assgn
     mongo.server_info() #trigger exception if cannot connect to db
 except:
     print("Error -connect to db")
+
+
+
+###Registration Page####
+@app.route("/register", methods=["GET"])
+def registration():
+    return render_template("registration.html")
+
+####registered##
+
+@app.route("/registered/", methods=["POST"] )
+def registered():
+    firstname=request.form.get('firstname')
+    lastname=request.form.get('lastname')
+    email=request.form.get('emailid')
+    dob=request.form.get('dob')
+    address=request.form.get('address')
+    cardtype=request.form.get('cardtype')
+    nameoncard=request.form.get('nameoncard')
+    cardnumber=request.form.get('cardnumber')
+    expirydate=request.form.get('expiry-date')
+    postcode=request.form.get('postcode')
+    user=request.form.get('username')
+    pword=request.form.get('password')
+    pword_rep=request.form.get('psw-repeat')
+    if (pword==pword_rep):
+     db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
+                              'address':address,'card_type':cardtype, 'name_on_card':nameoncard, 'expity_date':expirydate,'postcode':postcode,
+                              'username':user, 'password':pword})     
+     return render_template('login.html')
+    else:
+        messages='Password and Repeat Password is not the same!!'
+    flash(messages)
+    return render_template('registration.html')
+
+##############
 
 @app.route("/", methods=["GET"])
 def login():
@@ -48,8 +84,8 @@ def logged():
         return render_template ( "login.html" )
     # Find out if info in form matches a record in user database
     #query = "SELECT * FROM users WHERE username = :user AND password = :pwd"
-    rows = list(db.admin.find({"username":user,"password":pwd}))
-    print(rows)
+    rows = list(db.customers.find({"username":user,"password":pwd}))
+    #   print(rows)
     # If username and password match a record in database, set session variables
     if len(rows) == 1:
         session['uid'] = rows[0]['uid']
@@ -58,7 +94,7 @@ def logged():
         #session['uid'] = rows[0]["_id"]
     # Redirect to Home Page
     if 'user' in session:
-        print("line 58")
+        #print("line 58")
         return redirect ( "/shop" )
     # If username is not in the database return the log in page
     return render_template ( "login.html", msg="Wrong username or password." )
@@ -73,7 +109,8 @@ def index():
     if session and "uid" in session and session["uid"] in shoppingHash:
        shoppingCart = shoppingHash[session["uid"]]
     shopLen = len(shoppingCart)
-    print("here", shoppingCart, shoppingHash)
+   # print("here", shoppingCart, shoppingHash)
+    #print("Here")
     totItems, total, display = 0, 0, 0
     for i in range(shopLen):
        total += shoppingCart[i]["subTotal"]
@@ -178,16 +215,7 @@ def filter():
         query = request.args.get('category')
         #shirts = db.execute("SELECT * FROM shirts WHERE typeClothes = :query ORDER BY samplename ASC", query=query )
         products=list(db.products.find({"category":query}))
-    if request.args.get('id'):
-        query = int(request.args.get('id'))
-        shirts = db.execute("SELECT * FROM shirts WHERE id = :query ORDER BY samplename ASC", query=query)
-    if request.args.get('kind'):
-        query = request.args.get('kind')
-        shirts = db.execute("SELECT * FROM shirts WHERE kind = :query ORDER BY samplename ASC", query=query)
-    if request.args.get('price'):
-        query = request.args.get('price')
-        shirts = db.execute("SELECT * FROM shirts ORDER BY onSalePrice ASC")
-    shirtsLen = len(shirts)
+        productsLen = len(products)
     # Initialize shopping cart variables
     shoppingCart = []
     shopLen = len(shoppingCart)
@@ -202,7 +230,7 @@ def filter():
         # Render filtered view
         return render_template ("index.html", shoppingCart=shoppingCart, shirts=shirts, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display, session=session )
     # Render filtered view
-    return render_template ( "index2.html", shirts=shirts, shoppingCart=shoppingCart, shirtsLen=shirtsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 @app.route("/checkout/")
 def checkout():
