@@ -1,0 +1,164 @@
+[{
+  "_id": {
+    "$oid": "6559326e6666601651fca3bb"
+  },
+  "return_id": 1,
+  "return_items": [
+    {
+      "item_id": 12,
+      "item_qty": 2,
+      "item_price": 5
+    },
+    {
+      "item_id": 9,
+      "item_qty": 0,
+      "item_price": 8
+    }
+  ],
+  "return_total": 10,
+  "return_date": {
+    "$date": "2023-11-18T13:53:50.472Z"
+  },
+  "returned_by": 4,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 5,
+  "original_order_id": 3
+},
+{
+  "_id": {
+    "$oid": "65593b4c0ee1b939a5382aa3"
+  },
+  "return_id": 2,
+  "return_items": [
+    {
+      "item_id": 1,
+      "item_qty": 1,
+      "item_price": 5
+    }
+  ],
+  "return_total": 5,
+  "return_date": {
+    "$date": "2023-11-18T14:31:40.602Z"
+  },
+  "returned_by": 2,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 4
+},
+{
+  "_id": {
+    "$oid": "65593dcacfd266226332a219"
+  },
+  "return_id": 3,
+  "return_items": [
+    {
+      "item_id": 12,
+      "item_qty": 1,
+      "item_price": 5
+    }
+  ],
+  "return_total": 5,
+  "return_date": {
+    "$date": "2023-11-18T14:42:18.656Z"
+  },
+  "returned_by": 3,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 5
+},
+{
+  "_id": {
+    "$oid": "65593e90344b824f75f33d4a"
+  },
+  "return_id": 4,
+  "return_items": [
+    {
+      "item_id": 12,
+      "item_qty": 1,
+      "item_price": 5
+    }
+  ],
+  "return_total": 5,
+  "return_date": {
+    "$date": "2023-11-18T14:45:36.712Z"
+  },
+  "returned_by": 3,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 5
+},
+{
+  "_id": {
+    "$oid": "65593edb344b824f75f33d4c"
+  },
+  "return_id": 5,
+  "return_items": [
+    {
+      "item_id": 6,
+      "item_qty": 1,
+      "item_price": 7
+    }
+  ],
+  "return_total": 7,
+  "return_date": {
+    "$date": "2023-11-18T14:46:51.635Z"
+  },
+  "returned_by": 3,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 6
+},
+{
+  "_id": {
+    "$oid": "65593fd0344b824f75f33d4e"
+  },
+  "return_id": 6,
+  "return_items": [
+    {
+      "item_id": 6,
+      "item_qty": 0,
+      "item_price": 7
+    },
+    {
+      "item_id": 12,
+      "item_qty": 0,
+      "item_price": 5
+    }
+  ],
+  "return_total": 0,
+  "return_date": {
+    "$date": "2023-11-18T14:50:56.205Z"
+  },
+  "returned_by": 4,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 7
+},
+{
+  "_id": {
+    "$oid": "655941c2344b824f75f33d50"
+  },
+  "return_id": 7,
+  "return_items": [
+    {
+      "item_id": 11,
+      "item_qty": 2,
+      "item_price": 5
+    }
+  ],
+  "return_total": 10,
+  "return_date": {
+    "$date": "2023-11-18T14:59:14.915Z"
+  },
+  "returned_by": 4,
+  "payment_method": "card",
+  "payment_id": 1,
+  "return_status": 1,
+  "original_order_id": 8
+}]

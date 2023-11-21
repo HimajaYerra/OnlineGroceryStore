@@ -66,11 +66,16 @@
                     {% endfor %}
                     <tfoot>
                       <tr>
-                        <td colSpan="7">Total: {{ '${:,.2f}'.format(total) }}<br /><br />
-                          <div class="modal-footer">
-                            <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
-                            <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
-                            <a href="/checkout/"><button type="button" class="btn btn-success checkout">Quick Checkout</button></a>
+                        <td colSpan="6">
+                          <div class="modal-footer" style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <div>
+                              <b>Total:</b> {{ '${:,.2f}'.format(total) }}<br/>
+                            </div>
+                            <div>
+                              <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>
+                              <button type="button" class="btn btn-primary checkout" data-dismiss="modal">Continue Shopping</button>
+                              <a href="/checkout/"><button type="button" class="btn btn-success checkout">Checkout</button></a>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -82,7 +87,7 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <td colSpan="7">Get some shirts now!<br />
+                        <td colSpan="7">Get some groceries now!<br />
                           <div class="modal-footer">
                             <button type="button" class="btn btn-primary" data-dismiss="modal">Continue Shopping</button>
                           </div>
@@ -101,13 +106,13 @@
   </div>
   <header>
     <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-sm box-shadow">
-      <a href="/" class="navbar-brand d-flex align-items-center">
-          <strong><i class="fa  fa-cart-plus"></i> Sample Clothing Store</strong>
+      <a href="/shop" class="navbar-brand d-flex align-items-center">
+          <strong><i class="fa  fa-cart-plus"></i> Grocery Store</strong>
       </a>
       {% if session %}
       <ul class="navbar-nav mr-auto">
         <li class="nav-item"><a href="/logout/" class="nav-link">Logout</a></li>
-        <li class="nav-item"><a href="/history/" class="nav-link">You Bought</a></li>
+        <li class="nav-item"><a href="/orders/" class="nav-link">Orders</a></li>
       {% else %}
       <ul class="navbar-nav mr-auto">
         <li class="nav-item"><a href="/new/" class="nav-link">Register</a></li>
@@ -151,7 +156,7 @@
             <div class="row">
                 <div class="col-md">
                     <hr />
-                    <p>&#169; <a href="/">Sample Clothing Store</a></p>
+                    <p>&#169; <a href="/">Grocery Store</a></p>
                 </div>
             </div>
         </div>

@@ -1,15 +1,8 @@
 [{
   "_id": {
-    "$oid": "652899469a84f6317dec5351"
+    "$oid": "6546ba524a8e7e3be166b596"
   },
   "username": "admin",
-  "password": "12334"
-},
-{
-  "_id": {
-    "$oid": "654c334681b2887446d60c54"
-  },
-  "username": "admin",
-  "password": "1234",
-  "uid": "1"
+  "password": "admin",
+  "uid": 1
 }]

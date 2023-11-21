@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+Grocery Store - Home
+{% endblock %}
+
+{% block body %}
+<!-- Main Store Body -->
+    {% if session['user'] %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        </div>
+
+    {% endif %}
+    <h3>Order update</h3>
+    <form action="/fetch_order_history" method="GET">
+      {% if usersLen != 0 %}
+      <div style="display: flex; flex-direction: row; align-items: center;">
+        <div id="usersList" style="margin-right: 25px;">
+          <label for="userSelect" style="margin-bottom: 0px;">Select User:</label>
+          <select id="userSelect" name="selectedUser" style="height: 36px; min-width: 100px;">
+            {% for i in range(usersLen) %}
+              <option value="{{usersList[i]["uid"]}}" {% if usersList[i]["uid"] == preselected_uid %}selected{% endif %}>{{usersList[i]["username"]}}</option>
+            {% endfor %}
+          </select>
+          <br>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary" data-dismiss="modal">Fetch User Order</button>
+        </div>
+      </div>
+      {% endif %}
+    </form>
+
+    {% if ordersLen == 0 %}
+      <br>
+      <br>
+      <h3>No orders found</h3>
+    {% elif ordersLen > 0 %}
+      <br>
+      <br>
+      <h3>Orders for {{orderUser}}</h3>
+      <div id="ordersData">
+        {% for i in range(ordersLen) %}
+
+          <div class="container" style="margin-bottom: 50px;">
+            <h3>Order #{{i+1}}</h3>
+            <div style="display:flex; align-items: center; justify-content: space-between; border: 1px solid #d2d2d2; margin-bottom: 5px;">
+              {% for j in range(ordersData[i]["tracking_data"]|length) %}
+              <label style="max-width: 70px;" for="{{ordersData[i]["tracking_data"][j]["status_name"]}}"><b>{{ordersData[i]["tracking_data"][j]["status_name"]}}</b></label>
+              {% if j != ordersData[i]["tracking_data"]|length - 1 %}
+              <progress style="max-width: 120px;accent-color: orangered;" id="{{ordersData[i]["tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["tracking_data"][j]["status_value"]}}</progress>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] > 0 %}
+            <div style="display:flex; align-items: center; justify-content: space-between; border: 1px solid #d2d2d2; margin-bottom: 5px;">
+              {% for j in range(ordersData[i]["return_tracking_data"]|length) %}
+              <label style="max-width: 70px;" for="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}"><b>{{ordersData[i]["return_tracking_data"][j]["status_name"]}}</b></label>
+              {% if j != ordersData[i]["return_tracking_data"]|length - 1 %}
+              <progress style="width: 120px; accent-color: orangered;" id="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["return_tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["return_tracking_data"][j]["status_value"]}}</progress>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="row">
+              <div class="col-sm">
+                <div style="display: flex; justify-content: space-between;">
+                  <table class="table table-sm" style="margin-right: 2.5px; width: 60%; border: 1px solid #d2d2d2">
+                    <tbody>
+                      {% for j in range(ordersData[i]["orderItems"]|length) %}
+                      <tr>
+                        <td style="width: 30%;"><img src="/static/img/{{ ordersData[i]["orderItems"][j]["item_img"] }}" style="height: 100px; width: 100px;" /></td>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start; padding-left: 100px;">
+                            <div><b>{{ordersData[i]["orderItems"][j]["item_name"]}}</b></div>
+                            <div><b>Qty: </b>{{ordersData[i]["orderItems"][j]["item_qty"]}}</div>
+                            <div><b>Price: </b>{{'${:,.2f}'.format(ordersData[i]["orderItems"][j]["item_price"])}}</div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <table class="table table-sm" style="margin-left: 2.5px; width: 40%; border: 1px solid #d2d2d2">
+                    <tbody>
+                      <tr>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <div><b>Total price: </b>{{'${:,.2f}'.format(ordersData[i]["order_total"])}}</div>
+                            <div><b>Delivery type: </b>{{ordersData[i]["order_delivery_type"]}}</div>
+                            <div><b>Payment mode: </b>{{ordersData[i]["order_payment_method"]}}</div>
+                            <div><b>Order date: </b>{{ordersData[i]["order_date"]}}</div>
+                        </td>
+                      </tr>
+                      {% if ordersData[i]["order_refund_amount"] > 0 %}
+                      <tr>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start;">
+                          <div><b>Refund amount: </b>{{'${:,.2f}'.format(ordersData[i]["order_refund_amount"])}}</div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            {% if ordersData[i]["order_status"] < 5 %}
+            <a href="/update_order_status?uid={{preselected_uid}}&order_id={{ordersData[i]["order_id"]}}&status={{ordersData[i]["order_status"]+1}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Update to {{ordersData[i]["tracking_data"][ordersData[i]["order_status"]]["status_name"]}}</button></a>
+            {% endif %}
+            {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] > 0 and ordersData[i]["order_return_status"] < 5 %}
+            <a href="/update_return_order_status?uid={{preselected_uid}}&order_id={{ordersData[i]["order_id"]}}&status={{ordersData[i]["order_return_status"]+1}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Update to {{ordersData[i]["return_tracking_data"][ordersData[i]["order_return_status"]]["status_name"]}}</button></a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+{% endblock %}

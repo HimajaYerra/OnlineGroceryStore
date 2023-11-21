@@ -52,11 +52,11 @@ function validate ( )
 
 
     // This currently checks to see if the username is
-    // present and if it is at least 5 characters in length.
-    if ( !USERNAME.val() || USERNAME.val().length < 5  )
+    // present and if it is at least 3 characters in length.
+    if ( !USERNAME.val() || USERNAME.val().length < 3  )
     {
         // Show an invalid input message
-        USERNAME_MSG.html( "Username must be 5 characters or more" );
+        USERNAME_MSG.html( "Username must be 3 characters or more" );
         USERNAME_MSG.show();
         // Indicate the type of bad input in the console.
         console.log( "Bad username" );
