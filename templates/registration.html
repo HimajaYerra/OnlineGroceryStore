@@ -18,7 +18,7 @@
             * {box-sizing: border-box}
             
             /* Full-width input fields */
-            input[type=text], input[type=password] {
+            input[type=text], input[type=email], input[type=password] {
               width: 100%;
               padding: 15px;
               margin: 5px 0 22px 0;
@@ -27,11 +27,11 @@
               background: #f1f1f1;
             }
             
-            input[type=text]:focus, input[type=password]:focus {
+            input[type=text]:focus, input[type=email], input[type=password]:focus {
               background-color: #ddd;
               outline: none;
             }
-            
+                        
             hr {
               border: 1px solid #f1f1f1;
               margin-bottom: 25px;
@@ -62,7 +62,7 @@
             /* Float cancel and signup buttons and add an equal width */
             .cancelbtn, .signupbtn {
               float: left;
-              width: 50%;
+              width: 20%;
             }
             
             /* Add padding to container elements */
@@ -107,7 +107,7 @@
               <input type="text" placeholder="Enter lastname" name="lastname" required><br>
 
               <label for="emailid"><b>Email-ID</b></label>
-              <input type="email" placeholder="Enter Username" name="emailid" required><br>
+              <input type="email" placeholder="Enter Email-ID" name="emailid" required><br>
 
               <label for="DOB"><b>DateOfBirth</b></label>
               <input type="text" placeholder="Enter date of birth" name="dob" required><br>

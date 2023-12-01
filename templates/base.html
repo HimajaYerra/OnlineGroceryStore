@@ -45,7 +45,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                    <!-- For Each shirt -->
+                    <!-- For Each product -->
                     {% if shopLen != 0 %}
                     {% for i in range(shopLen) %}
                       <tr>
@@ -115,8 +115,8 @@
         <li class="nav-item"><a href="/orders/" class="nav-link">Orders</a></li>
       {% else %}
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item"><a href="/new/" class="nav-link">Register</a></li>
-        <li class="nav-item"><a href="/login/" class="nav-link">Login</a></li>
+        <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
+        <li class="nav-item"><a href="/" class="nav-link">Login</a></li>
 
       {% endif %}
         <li class="nav-item dropdown">
@@ -124,7 +124,7 @@
             Filter By
           </a>
           <div class="dropdown-menu">
-              <a class="dropdown-item" href="/">All</a>
+              <a class="dropdown-item" href="/shop">All</a>
               <a class="dropdown-item" href="/filter/?category=cereals">Cereals</a>
               <a class="dropdown-item" href="/filter/?category=fresh foods">Fresh Foods</a>
               <a class="dropdown-item" href="/filter/?category=snacks">Snacks</a>

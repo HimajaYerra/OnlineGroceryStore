@@ -124,7 +124,7 @@ def logged():
     # Find out if info in form matches a record in user database
     #query = "SELECT * FROM users WHERE username = :user AND password = :pwd"
 
-    rows = list(db.customers.find({"username":user,"password":pwd}))
+     #rows = list(db.customers.find({"username":user,"password":pwd}))
     #   print(rows)
 
     adminLogin = False
@@ -173,7 +173,7 @@ def index():
     for i in range(shopLen):
        total += shoppingCart[i]["subTotal"]
        totItems += shoppingCart[i]["qty"]
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
   
 
@@ -193,7 +193,7 @@ def order_update():
     usersList = list(db.users.find({}))
     usersLen = len(usersList)
 
-    return render_template ( "order_update.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, usersList=usersList, usersLen=usersLen, preselected_uid=2, ordersData=[], orderUser="", ordersLen=-1)
+    return render_template ( "order_update.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, usersList=usersList, usersLen=usersLen, preselected_uid=2, ordersData=[], orderUser="", ordersLen=-1)
 
 @app.route('/fetch_order_history/',methods=["GET"])
 def fetch_order_history(uidInput=None):
@@ -240,7 +240,7 @@ def fetch_order_history(uidInput=None):
             if user["uid"] == uid:
                 orderUser = user["username"]
                 break
-    return render_template ( "order_update.html", products=[], shoppingCart=[], shirtsLen=0, shopLen=0, total=0, totItems=0, display=0, usersList=usersList, usersLen=usersLen, preselected_uid=preselected_uid, ordersData=ordersData, orderUser=orderUser, ordersLen=len(ordersData))
+    return render_template ( "order_update.html", products=[], shoppingCart=[], productsLen=0, shopLen=0, total=0, totItems=0, display=0, usersList=usersList, usersLen=usersLen, preselected_uid=preselected_uid, ordersData=ordersData, orderUser=orderUser, ordersLen=len(ordersData))
 
 @app.route("/update_order_status/")
 def update_order_status():
@@ -425,10 +425,10 @@ def buy():
         # Select all shirts for home page view
         #shirts = db.execute("SELECT * FROM shirts ORDER BY samplename ASC")
         products = list(db.products.find({}))
-        shirtsLen = len(products)
+        productsLen = len(products)
         # Go back to home page
-        #return render_template ("index2.html", shoppingCart=shoppingCart, shirts=products, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display, session=session )
-        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display )
+        #return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, session=session )
+        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display )
 
 @app.route("/filter/")
 def filter():
@@ -443,15 +443,15 @@ def filter():
     totItems, total, display = 0, 0, 0
     if 'user' in session:
         # Rebuild shopping cart
-        shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
+        #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
         shopLen = len(shoppingCart)
         for i in range(shopLen):
             total += shoppingCart[i]["SUM(subTotal)"]
             totItems += shoppingCart[i]["SUM(qty)"]
         # Render filtered view
-        return render_template ("index.html", shoppingCart=shoppingCart, shirts=shirts, shopLen=shopLen, shirtsLen=shirtsLen, total=total, totItems=totItems, display=display, session=session )
+       # return render_template ("index.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, session=session )
     # Render filtered view
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 @app.route("/checkout/")
 def checkout():
@@ -511,7 +511,7 @@ def cart():
     for i in range(shopLen):
         total += shoppingCart[i]["subTotal"]
         totItems += shoppingCart[i]["qty"]
-    return render_template ( "cart.html", products=products, shoppingCart=shoppingCart, shirtsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    return render_template ( "cart.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
 
 @app.route("/logout/")
 def logout():
@@ -687,71 +687,6 @@ def orders_history(user_id = None):
 
             ordersData.append({"order_id": order_id, "orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "order_isreturnable": order_isreturnable, "order_status": order_status, "order_return_status": order_return_status, "tracking_data": tracking_data, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
     return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=shopLen, shoppingCart=shoppingCart, total=total, totItems=totItems, uid=uid)
-
-########################################################################################################
-@app.route('/old')
-def login_old():
-  url=requests.get('https://dog.ceo/api/breeds/image/random')
-  image=json.loads(url.text)
-  return render_template('index2.html',imagefile=image['message'])
-
-@app.route('/login1',methods=['POST'])
-def login1(): #when users entry username and password
-  user=request.form.get('username')
-  pword=request.form.get('password')
-  documents = list(db.admin.find({"username":user,"password":pword}))
-  #("SELECT username,password FROM admindata")  # id username password
-  #row=cursor.fetchall()
-  if len(documents)>0:
-    #if (user==item[0] and pbkdf2_sha256.verify(pword,item[1])):
-    url=requests.get('https://dog.ceo/api/breeds/image/random')
-    image=json.loads(url.text)
-    return render_template('index.html',imagefile=image['message'])
-  url=requests.get('https://dog.ceo/api/breeds/image/random')
-  image=json.loads(url.text)
-  return render_template('login.html',imagefile=image['message'])
-
-@app.route('/signup')
-def signup():
-  return render_template('signup.html')
-
-@app.route('/signup1', methods=['POST'])
-def signup1():
-  user=request.form.get('username')
-  pword=request.form.get('password')
-  pword_rep=request.form.get('psw-repeat')
-  if (pword==pword_rep):
-    cursor.execute("SELECT username,password FROM user")  # id username password
-    row=cursor.fetchall()
-    for item in row:
-      if (user==item[0] and pbkdf2_sha256.verify(pword,item[1])):
-        url=requests.get('https://dog.ceo/api/breeds/image/random')
-        image=json.loads(url.text)
-        return render_template('index.html',imagefile=image['message'])
-    cursor.execute('INSERT INTO user(username, password) VALUES(?,?)',(user,pbkdf2_sha256.hash(pword),))
-    conn.commit()
-    url=requests.get('https://dog.ceo/api/breeds/image/random')
-    image=json.loads(url.text)
-    return render_template('login.html',imagefile=image['message'])
-  else:
-    messages='Password and Repeat Password is not the same!!'
-    flash(messages)
-    return render_template('signup.html')
-
-@app.route('/nature')
-def nature():
-  return render_template('nature.html')
-
-@app.route('/dogs')
-def dogs():
-  n=20
-  imglist=[]
-  for i in range(n): #i: 0 to n-1
-    url=requests.get('https://dog.ceo/api/breeds/image/random')
-    image=json.loads(url.text)
-    imglist.append([i+1,image['message']]) 
-    #imglist = [ [1,'xxxxx'], [2,'BBBBB'] ]  total = n
-  return render_template('dogs.html', data=imglist, total=n)
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True) #port > 1024
