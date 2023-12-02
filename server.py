@@ -36,7 +36,7 @@ try:
         port = 27017,
         serverSelectionTimeoutMS = 1000
     )
-    db = mongo.onlinegrocerystore #connect to assgn
+    db = mongo.groceryStore #connect to assgn
     mongo.server_info() #trigger exception if cannot connect to db
 except:
     print("Error -connect to db")
@@ -114,6 +114,7 @@ def login():
 
 @app.route("/logged/", methods=["POST"] )
 def logged():
+    print("Here")
     # Get log in info from log in form
     user = request.form["username"].lower()
     pwd = request.form["password"]
@@ -127,8 +128,11 @@ def logged():
      #rows = list(db.customers.find({"username":user,"password":pwd}))
     #   print(rows)
 
+    print(user, pwd)
+
     adminLogin = False
     rows = list(db.admin.find({"username":user,"password":pwd}))
+    print(rows)
     if (len(rows) == 1):
         adminLogin = True
     else:

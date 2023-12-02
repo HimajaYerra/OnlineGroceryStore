@@ -29,20 +29,48 @@
     <main>
         <div class="container">
             <div class="row">
-                <div class="col-sm">
-                    <h2>Log In to Buy</h2>
+                <div class="col-sm" style="max-width: 300px; border: 1px solid #285e35; border-radius: 5px; margin: 5px; background-color: white;">
+                    <h3 style="margin: 5px;">Login</h3>
                     <p>{{ msg }}</p>
-                    <div>
+                    <div style="display: flex; flex-direction: column;">
                         <form action="/logged/" class="form" method="post">
-                            <div>
-                                <input type="text" name="username" autofocus placeholder="Username">
-                                <input type="password" name="password" placeholder="Password">
-                                <button type="submit" class="btn btn-primary">Login</button>
+                            <div style="display: flex; flex-direction: column;">
+                                <input style="margin: 5px;" type="text" name="username" autofocus placeholder="Username">
+                                <input style="margin: 5px;" type="password" name="password" placeholder="Password">
+                                <button style="margin: 5px;" type="submit" class="btn btn-primary">Login</button>
                             </div>
                         </form>
-                        <a href="/register">
-                            <strong><i class="fa  fa-cart-plus"></i>New User ! Register here</strong>
+                        <a href="/register" style="margin: 5px;">
+                            <strong><i class="fa  fa-cart-plus"></i>New User! Register here</strong>
                         </a>
+                    </div>
+                </div>
+                <div class="col-sm" style="border: 1px solid #285e35; border-radius: 5px; margin: 5px; background-color: #b5d5b5;">
+                    <div>
+                        <h3>Seamless shopping at your fingertips!</h3><br>
+                    </div>
+                    <div style="display: flex; justify-content: space-around;">
+                        <div style="display: flex; flex-direction: column; width: 400px;">
+                            <div style="margin-top: 5px;"><b>* Experience grocery shopping on your terms.</b></div>
+                            <div style="margin-top: 5px;"><b>* Order online for seamless delivery or easy pick-up.</b></div>
+                            <div style="margin-top: 5px;"><b>* Groceries made simple.</b></div>
+                            <img style="margin: 5px;" src="../static/img/grocery9.png" alt="" />
+                            <div style="color: brown element; position: absolute; bottom: 250px; width: 100px; right: 520px;"><b>Select from a wide range of products</b></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; width: 250px;">
+                            <div style="margin: 10px;">
+                                <img style="width: 100%;" src="../static/img/grocery2.jpg" alt="" />
+                                <div><b>Order online</b></div>
+                            </div>
+                            <div style="margin: 10px;">
+                                <img style="width: 100%;" src="../static/img/grocery3.jpg" alt="" />
+                                <div><b>Express delivery</b></div>
+                            </div>
+                            <div style="margin: 10px;">
+                                <img style="width: 100%;" src="../static/img/grocery1.jpg" alt="" />
+                                <div><b>Pick-up up from store</b></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
