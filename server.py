@@ -538,8 +538,8 @@ def order_success():
     if not ret.acknowledged:
         print("Error: Failed to insert into orders collection")
     else:
-       del shoppingHash[uid]
-       del orderHash[uid]
+        orderHash[uid] = [] 
+        shoppingHash[uid] = []
     return redirect('/shop') 
 
 @app.route('/payment', methods=['POST'])
