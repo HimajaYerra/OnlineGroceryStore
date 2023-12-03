@@ -88,21 +88,83 @@ Grocery Store - Home
           </div>
       </div>
 
-      <h3>Delivery details</h3>
-      <div style="display: flex; flex-direction: column; width: 300px;">
-        <input type="hidden" name="uid" value="{{ uid }}">
-        <input style="margin-bottom: 2.5px;" type="text" name="address1" placeholder="Address line 1" />
-        <input style="margin-bottom: 2.5px;" type="text" name="address2" placeholder="Address line 2" />
-        <input style="margin-bottom: 2.5px;" type="text" name="city" placeholder="City" />
-        <input style="margin-bottom: 2.5px;" type="text" name="state" placeholder="State" />
-        <input style="margin-bottom: 2.5px;" type="text" name="zip" placeholder="Zipcode" />
+      <div style="display: flex; flex-direction: column;">
+        <div style="margin-right: 10px;">
+          <label>
+            <input type="radio" name="order-options" value="delivery-option" onchange="handleRadioButtonChange(this)"><b> Delivery</b> 
+          </label>
+          <label>
+            <input type="radio" name="order-options" value="pickup-option" onchange="handleRadioButtonChange(this)"><b> Pickup</b>
+          </label>
+        </div>
+
+        <div style="margin-right: 10px;">
+          <div id="delivery-option" class="delivery-option">
+            <h3>Delivery details</h3>
+            <div style="display: flex; flex-direction: column; width: 300px;">
+              <input type="hidden" name="uid" value="{{ uid }}">
+              <input oninput="checkFields()" style="margin-bottom: 2.5px;" type="text" name="address1" placeholder="Address line 1" />
+              <input oninput="checkFields()" style="margin-bottom: 2.5px;" type="text" name="address2" placeholder="Address line 2" />
+              <input oninput="checkFields()" style="margin-bottom: 2.5px;" type="text" name="city" placeholder="City" />
+              <input oninput="checkFields()" style="margin-bottom: 2.5px;" type="text" name="state" placeholder="State" />
+              <input oninput="checkFields()" style="margin-bottom: 2.5px;" type="text" name="zip" placeholder="Zipcode" />
+            </div>
+          </div>
+          <div id="pickup-option" class="pickup-option">
+            <h3>Pickup details</h3>
+            <div>116 W South St</div>
+            <div>Warrensburg</div>
+            <div>MO 64093</div>
+          </div>
+        </div>
       </div>
 
       <div id="order" style="margin-right: 63px; display: flex; justify-content: flex-end; align-items: center;">
-        <button type="submit" class="btn btn-primary" data-dismiss="modal">Proceed to pay {{'${:,.2f}'.format(total)}}</button>
+        <button id="proceedToPayButton" disabled type="submit" class="btn btn-primary" data-dismiss="modal">Proceed to pay {{'${:,.2f}'.format(total)}}</button>
       </div>
     </div>
     </form>
   </main>
+  <script>
+    // Function to handle radio button changes
+    function handleRadioButtonChange(radio) {
+      // Get all radio buttons in the same group
+      var radioButtons = document.getElementsByName(radio.name);
+      var proceedToPayButton = document.getElementById('proceedToPayButton');
+
+      // Iterate through the radio buttons
+      radioButtons.forEach(function (currentRadio) {
+        // Get the div associated with the radio button
+        var associatedDiv = document.getElementById(currentRadio.value);
+        if (currentRadio.defaultValue == "pickup-option" && currentRadio.checked) {
+          proceedToPayButton.disabled = false;
+        } else {
+          checkFields();
+        }
+
+        // Toggle the visibility of the div based on radio button state
+        if (currentRadio.checked) {
+          associatedDiv.style.display = 'block';
+        } else {
+          associatedDiv.style.display = 'none';
+        }
+      });
+    }
+
+    // Function to check if all input fields are filled
+    function checkFields() {
+      var inputs = document.querySelectorAll('input[type="text"]');
+      var proceedToPayButton = document.getElementById('proceedToPayButton');
+
+      // Check if all input fields are not empty
+      var allFilled = Array.from(inputs).every(function(input) {
+        return input.value.trim() !== '';
+      });
+
+      // Enable/disable the confirm button based on the result
+      proceedToPayButton.disabled = !allFilled;
+    }
+</script>
+</body>
 
 {% endblock %}

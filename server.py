@@ -76,7 +76,7 @@ def registered():
     return render_template('registration.html')
 
 ##############
-def getTrackingData(curr_status=1):
+def getTrackingData(order_delivery_type, curr_status=1):
     trackingData = [
         {"status": 1, "status_name": "Ordered", "status_value": 0},
         {"status": 2, "status_name": "Preparing", "status_value": 0},
@@ -84,6 +84,10 @@ def getTrackingData(curr_status=1):
         {"status": 4, "status_name": "Delivery", "status_value": 0},
         {"status": 5, "status_name": "Delivered", "status_value": 0},
     ]
+
+    if order_delivery_type == "pickup":
+        trackingData[3]["status_name"] = "Ready for pickup"
+        trackingData[4]["status_name"] = "Order picked"
     for t in trackingData:
         if t["status"] <= curr_status:
             t["status_value"] = 100
@@ -114,7 +118,6 @@ def login():
 
 @app.route("/logged/", methods=["POST"] )
 def logged():
-    print("Here")
     # Get log in info from log in form
     user = request.form["username"].lower()
     pwd = request.form["password"]
@@ -128,11 +131,9 @@ def logged():
      #rows = list(db.customers.find({"username":user,"password":pwd}))
     #   print(rows)
 
-    print(user, pwd)
 
     adminLogin = False
     rows = list(db.admin.find({"username":user,"password":pwd}))
-    print(rows)
     if (len(rows) == 1):
         adminLogin = True
     else:
@@ -231,7 +232,7 @@ def fetch_order_history(uidInput=None):
             order_status = order["order_status"]
             order_id = order["order_id"]
             order_return_status = order["order_return_status"]
-            tracking_data = getTrackingData(order["order_status"])
+            tracking_data = getTrackingData(order_delivery_type, order["order_status"])
             return_tracking_data = getReturnTrackingData(order_return_status)
             order_refund_amount = 0
             if order_return_status > 0:
@@ -348,7 +349,7 @@ def returns():
             order_total = order["order_total"]
             order_status = order["order_status"]
             order_id = order["order_id"]
-            tracking_data = getTrackingData(order["order_status"])
+            tracking_data = getTrackingData(order_delivery_type, order["order_status"])
             ordersData.append({"orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "order_status": order_status, "order_id": order_id, "tracking_data": tracking_data})
         order = orders[0]
         return render_template("return.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0, uid=uid)
@@ -545,11 +546,24 @@ def order_success():
 @app.route('/payment', methods=['POST'])
 def payment():
     uid = int(request.form["uid"])
-    address1 = request.form["address1"]
+
+    orderOptions = request.form["order-options"]
+    deliveryOption = True # false indicates pickupOption
+    if (orderOptions == "pickup-option"): 
+        deliveryOption = False
+
+    pickupAddress = {
+        "line1": "116 W South St",
+        "city": "Warrensburg",
+        "state": "MO",
+        "postcode": "64093"
+    }
+
+    address1 = request.form["address1"] if deliveryOption == True else pickupAddress["line1"]
     address2 = request.form["address2"]
-    city = request.form["city"]
-    state = request.form["state"]
-    zipcode = request.form["zip"]
+    city = request.form["city"] if deliveryOption == True else pickupAddress["city"]
+    state = request.form["state"] if deliveryOption == True else pickupAddress["state"]
+    zipcode = request.form["zip"] if deliveryOption == True else pickupAddress["postcode"]
 
     shoppingCart = []
     if uid in shoppingHash:
@@ -583,7 +597,7 @@ def payment():
 
         order["order_date"] = datetime.now()
         order["ordered_by"] = session["uid"]
-        order["order_delivery_type"] = "delivery"
+        order["order_delivery_type"] = "delivery" if deliveryOption == True else "pickup"
         order["payment_method"] = "card"
         order["payment_id"] = 1
         order["delivery_address"] = {"line1": address1, "city": city, "state": state, "postcode": zipcode}
@@ -680,7 +694,7 @@ def orders_history(user_id = None):
             order_isreturnable = order["order_isreturnable"]
             order_status = order["order_status"]
             order_return_status = order["order_return_status"]
-            tracking_data = getTrackingData(order_status)
+            tracking_data = getTrackingData(order_delivery_type, order_status)
             return_tracking_data = getReturnTrackingData(order_return_status)
             order_refund_amount = 0
             if order_return_status > 0:

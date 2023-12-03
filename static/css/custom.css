@@ -53,6 +53,14 @@ header {
     font-weight: bold;
 }
 
+.delivery-option {
+    display: none;
+}
+
+.pickup-option {
+    display: none;
+}
+
 .add:hover {
     background-color: deepskyblue;
     border-color: deepskyblue;
