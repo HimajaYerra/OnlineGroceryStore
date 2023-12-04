@@ -6,21 +6,18 @@ Grocery Store - Home
 
 {% block body %}
 <!-- Main Store Body -->
-    {% if session['user'] %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-            <strong>Welcome, {{ session['user'] }}</strong> Hope you have a pleasant experience shopping with us.
-        </div>
-
-    {% endif %}
-    <h3>Order status</h3>
     <div id="ordersData">
+      <div class="container" style="display: flex; align-items: flex-start; justify-content: flex-end;">
+        <label for="filterOrders">Filter orders&nbsp;&nbsp;</label>
+        <select id="filterOrders" onchange="onFilterOrders()">
+          <option value="/orders-all" {% if filterOption == 'all' %}selected{% endif %}>All</option>
+          <option value="/orders-all?order_status=undelivered" {% if filterOption == 'undelivered' %}selected{% endif %}>Undelivered</option>
+          <option value="/orders-all?order_status=returns" {% if filterOption == 'returns' %}selected{% endif %}>Returns</option>
+        </select>
+      </div>
       {% for i in range(ordersLen) %}
-        
         <div class="container" style="margin-bottom: 50px;">
-          <h3>Order #{{i+1}}</h3>
+          <h3>Order Id: {{ordersData[i]["order_id"]}}</h3>
           <div style="display:flex; align-items: center; justify-content: space-between; border: 1px solid #d2d2d2; margin-bottom: 5px;">
             {% for j in range(ordersData[i]["tracking_data"]|length) %}
             <label style="max-width: 70px;" for="{{ordersData[i]["tracking_data"][j]["status_name"]}}"><b>{{ordersData[i]["tracking_data"][j]["status_name"]}}</b></label>
@@ -78,13 +75,26 @@ Grocery Store - Home
               </div>
             </div>
           </div>
-          {% if ordersData[i]["order_isreturnable"] %}
-            {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] == 0 %}
-              <a href="/return?order_id={{ordersData[i]["order_id"]}}&uid={{uid}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Start return</button></a>
-            {% endif %}
+          {% if ordersData[i]["order_status"] < 5 %}
+          <a href="/update_order_status?uid={{ordersData[i]["ordered_by"]}}&order_id={{ordersData[i]["order_id"]}}&status={{ordersData[i]["order_status"]+1}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Update to {{ordersData[i]["tracking_data"][ordersData[i]["order_status"]]["status_name"]}}</button></a>
+          {% endif %}
+          {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] > 0 and ordersData[i]["order_return_status"] < 5 %}
+          <a href="/update_return_order_status?uid={{ordersData[i]["ordered_by"]}}&order_id={{ordersData[i]["order_id"]}}&status={{ordersData[i]["order_return_status"]+1}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Update to {{ordersData[i]["return_tracking_data"][ordersData[i]["order_return_status"]]["status_name"]}}</button></a>
           {% endif %}
         </div>
       {% endfor %}
     </div>
+           
   </main>
+  <script>
+    function onFilterOrders() {
+        // Get the selected option value
+        var selectedOption = document.getElementById("filterOrders").value;
+
+        // Redirect to the selected URL
+        window.location.href = selectedOption;
+    }
+  </script>
+  </body>
+
 {% endblock %}

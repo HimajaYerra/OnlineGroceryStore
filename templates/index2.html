@@ -15,6 +15,16 @@ Grocery Store - Home
         </div>
 
     {% endif %}
+    <div class="container" style="display: flex; align-items: flex-start; justify-content: flex-end;">
+      <label for="filterProducts">Filter orders&nbsp;&nbsp;</label>
+      <select id="filterProducts" onchange="onFilterProducts()">
+        <option value="/shop" {% if filterOption == 'all' %}selected{% endif %}>All</option>
+        <option value="/filter/?category=cereals" {% if filterOption == 'cereals' %}selected{% endif %}>Cereals</option>
+        <option value="/filter/?category=fresh foods" {% if filterOption == 'fresh_foods' %}selected{% endif %}>Fresh foods</option>
+        <option value="/filter/?category=snacks" {% if filterOption == 'snacks' %}selected{% endif %}>Snacks</option>
+        <option value="/filter/?category=frozen" {% if filterOption == 'frozen' %}selected{% endif %}>Frozen</option>
+      </select>
+    </div>
       <div class="row" id="productCard">
       {% for i in range(productsLen) %}
           <div class="col-sm">
@@ -42,6 +52,7 @@ Grocery Store - Home
                       <input type="hidden" name="loggedin" value="1" />
 
                       {% endif %}
+                      <input type="hidden" name="buyFilterOption" value="" />
                       <input type="submit" class="btn btn-primary addToCart" value="Add To Cart" /><br /><br />
                       <div class="alert alert-danger flashMessage" style="text-align: center; display:none; font-size:0.9em;"></div>
                     </form>
@@ -52,5 +63,22 @@ Grocery Store - Home
       </div>
     </div>
   </main>
+  <script>
+    function getBuyFilterOption() {
+       document.getElementByName("buyFilterOption").value = result = document.getElementById("filterProducts").value;
+    }
+
+    function onFilterProducts() {
+        // Get the selected option value
+        var selectedOption = document.getElementById("filterProducts").value;
+
+        // Redirect to the selected URL
+        window.location.href = selectedOption;
+    }
+
+    getBuyFilterOption();
+
+  </script>
+  </body>
 
 {% endblock %}

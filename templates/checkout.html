@@ -57,8 +57,9 @@ Grocery Store - Home
                   <tr>
                     <td colSpan="6">
                       <div class="modal-footer" style="display: flex; flex-direction: column; align-items: flex-end;">
-                        <div>
-                          <b>Total:</b> {{ '${:,.2f}'.format(total) }}<br/>
+                        <div style="display: flex; flex-direction: column; align-content: flex-end;">
+                          <div style="display: inline-flex; justify-content: flex-end;"><b>Tax:&nbsp;</b> {{ '{:,.2f}'.format(6) }} %</div>
+                          <div><b>Total:</b> {{ '${:,.2f}'.format(total) }}</div>
                         </div>
                         <div>
                           <a href="/cart/"><button type="button" class="btn btn-primary checkout">Make Changes</button></a>

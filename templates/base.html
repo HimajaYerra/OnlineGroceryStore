@@ -109,30 +109,39 @@
       <a href="/shop" class="navbar-brand d-flex align-items-center">
           <strong><i class="fa  fa-cart-plus"></i> Grocery Store</strong>
       </a>
+      <ul class="navbar-nav mr-auto">
       {% if session %}
-      <ul class="navbar-nav mr-auto">
         <li class="nav-item"><a href="/logout/" class="nav-link">Logout</a></li>
-        <li class="nav-item"><a href="/orders/" class="nav-link">Orders</a></li>
-      {% else %}
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
-        <li class="nav-item"><a href="/" class="nav-link">Login</a></li>
-
-      {% endif %}
-        <li class="nav-item dropdown">
+        {% if session['uid'] != 1 %}
+          <li class="nav-item"><a href="/orders/" class="nav-link">Orders</a></li>
+        {% else %}
+          <li class="nav-item"><a href="/orders-all/" class="nav-link">Orders</a></li>
+        {% endif %}
+        <li class="nav-item dropdown" style="display: none;">
           <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
             Filter By
           </a>
           <div class="dropdown-menu">
+            {% if session['uid'] != 1 %}
               <a class="dropdown-item" href="/shop">All</a>
               <a class="dropdown-item" href="/filter/?category=cereals">Cereals</a>
               <a class="dropdown-item" href="/filter/?category=fresh foods">Fresh Foods</a>
               <a class="dropdown-item" href="/filter/?category=snacks">Snacks</a>
               <a class="dropdown-item" href="/filter/?category=frozen">Frozen</a>
+            {% else %}
+              <a class="dropdown-item" href="/orders-all">All</a>
+              <a class="dropdown-item" href="/orders-all?order_status=undelivered">Undelivered</a>
+              <a class="dropdown-item" href="/orders-all?order_status=returns">Returns</a>
+            {% endif %}
           </div>
         </li>
+      {% else %}
+        <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
+        <li class="nav-item"><a href="/" class="nav-link">Login</a></li>
+      {% endif %}
       </ul>
       <div>
+        {% if session['uid'] != 1 %}
         <button class="navbar-toggler" style="display:inline" type="button" data-toggle="modal" data-target="#modalCenter">
           <span class="glyphicon glyphicon-shopping-cart" data-toggle="modal" data-target="">
             <i class="fas fa-shopping-cart"></i>
@@ -140,6 +149,7 @@
             <span class="counter">Total: ${{ '{:,.2f}'.format(total) }}</span>
           </span>
         </button>
+        {% endif %}
       </div>
     </nav>
   </header><br />

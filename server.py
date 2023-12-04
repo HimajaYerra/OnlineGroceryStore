@@ -141,18 +141,15 @@ def logged():
 
     # If username and password match a record in database, set session variables
     if len(rows) == 1:
-        session['uid'] = rows[0]['uid']
+        session['uid'] = int(rows[0]['uid'])
         session['user'] = user
         session['time'] = datetime.now()
         #session['uid'] = rows[0]["_id"]
     # Redirect to Home Page
     if 'user' in session:
 
-        #print("line 58")
-        return redirect ( "/shop" )
-
         if adminLogin:
-            return redirect("/order_update")
+            return redirect("/orders-all")
         else:
             return redirect ( "/shop" )
 
@@ -163,6 +160,7 @@ def logged():
 
 @app.route("/shop")
 def index():
+    filterOption="all"
     products = list(db.products.find({}))
     productsLen = len(products)
     shoppingCart = []
@@ -178,7 +176,7 @@ def index():
     for i in range(shopLen):
        total += shoppingCart[i]["subTotal"]
        totItems += shoppingCart[i]["qty"]
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
 
   
 
@@ -240,6 +238,7 @@ def fetch_order_history(uidInput=None):
                 if len(allReturns) == 1:
                     return_order = allReturns[0]
                     order_refund_amount = return_order["return_total"]
+            order_refund_amount += (order_refund_amount * (6/100))
             ordersData.append({"orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "order_status": order_status, "order_id": order_id, "tracking_data": tracking_data, "order_return_status": order_return_status, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
         for user in usersList:
             if user["uid"] == uid:
@@ -258,7 +257,7 @@ def update_order_status():
     else:
         print("Not updated")
 
-    return fetch_order_history(uid)
+    return orders_all()
 
 @app.route("/update_return_order_status")
 def update_return_order_status():
@@ -272,7 +271,7 @@ def update_return_order_status():
         ret = db.orders.update_one({"order_id": return_order_id}, {"$set": {"order_return_status": newstatus}})
         if ret.modified_count > 0:
             print("Updated successfully")
-    return fetch_order_history(uid)
+    return orders_all()
 
 @app.route("/initiate_return")
 def initiate_return():
@@ -390,6 +389,7 @@ def buy():
     # Initialize shopping cart variables
     totItems, total, display = 0, 0, 0
     qty = int(request.args.get('quantity'))
+    filterOption = request.args.get('buyFilterOption')
     sampleNameIdxMap = {}
     if session:
         uid = session['uid']
@@ -433,30 +433,34 @@ def buy():
         productsLen = len(products)
         # Go back to home page
         #return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, session=session )
-        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display )
+        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, filterOption=filterOption )
 
 @app.route("/filter/")
 def filter():
+    filterOption = "all";
+    products = []
+    productsLen = 0
     if request.args.get('category'):
         query = request.args.get('category')
-        #shirts = db.execute("SELECT * FROM shirts WHERE typeClothes = :query ORDER BY samplename ASC", query=query )
+        filterOption = query
         products=list(db.products.find({"category":query}))
         productsLen = len(products)
     # Initialize shopping cart variables
     shoppingCart = []
+    uid = None
+    if session and "uid" in session and session["uid"] in shoppingHash:
+       shoppingCart = shoppingHash[session["uid"]]
+       uid = session["uid"]
+
+    total = 0
+    totItems = 0
+    if len(shoppingCart) > 0:
+        for item in shoppingCart:
+           total += item["subTotal"]
+           totItems += item["qty"]
     shopLen = len(shoppingCart)
-    totItems, total, display = 0, 0, 0
-    if 'user' in session:
-        # Rebuild shopping cart
-        #shoppingCart = db.execute("SELECT samplename, image, SUM(qty), SUM(subTotal), price, id FROM cart GROUP BY samplename")
-        shopLen = len(shoppingCart)
-        for i in range(shopLen):
-            total += shoppingCart[i]["SUM(subTotal)"]
-            totItems += shoppingCart[i]["SUM(qty)"]
-        # Render filtered view
-       # return render_template ("index.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, session=session )
-    # Render filtered view
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display)
+    display = 0
+    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
 
 @app.route("/checkout/")
 def checkout():
@@ -473,6 +477,7 @@ def checkout():
         for item in shoppingCart:
            total += item["subTotal"]
            totItems += item["qty"]
+        total += (total * (6/100))
         return render_template("checkout.html", shoppingCart=shoppingCart, shopLen=len(shoppingCart), total=total, totItems=totItems, key=stripe_keys["publishable_key"], session = session, uid=uid)
     return redirect('/shop')
 
@@ -595,6 +600,8 @@ def payment():
                         itemIsReturnable = True
             order["order_items"].append({"item_id": item["item_id"], "item_qty": item["qty"], "item_price": item["price"], "item_isreturnable": itemIsReturnable})
 
+        # Add tax to order total
+        order["order_total"] += (order["order_total"] * (6/100))
         order["order_date"] = datetime.now()
         order["ordered_by"] = session["uid"]
         order["order_delivery_type"] = "delivery" if deliveryOption == True else "pickup"
@@ -614,7 +621,9 @@ def payment():
         # Make a stripe payment
         stripeItems = []
         for item in order["order_items"]:
-           stripeItems.append({"price_data": {"currency": "usd", "product_data": {"name": itemIdToItemNameMap[item["item_id"]]}, "unit_amount": item["item_price"]*100}, "quantity": item["item_qty"]})
+            unit_amount = item["item_price"]*100
+            unit_amount += int((unit_amount * (6/100)))
+            stripeItems.append({"price_data": {"currency": "usd", "product_data": {"name": itemIdToItemNameMap[item["item_id"]]}, "unit_amount": unit_amount}, "quantity": item["item_qty"]})
         
         orderHash[uid] = order
 
@@ -705,6 +714,56 @@ def orders_history(user_id = None):
 
             ordersData.append({"order_id": order_id, "orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "order_isreturnable": order_isreturnable, "order_status": order_status, "order_return_status": order_return_status, "tracking_data": tracking_data, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
     return render_template("orders.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=shopLen, shoppingCart=shoppingCart, total=total, totItems=totItems, uid=uid)
+
+@app.route('/orders-all/')
+def orders_all():
+    orders = []
+    queryStatus = request.args.get('order_status')
+    if (queryStatus == "undelivered"):
+        orders = list(db.orders.find({"order_status": {"$lt": 5}}))
+    elif (queryStatus == "returns"):
+        orders = list(db.orders.find({"order_isreturnable": True, "order_return_status": {"$lt": 5}}))
+    else:
+        orders = list(db.orders.find({}))
+        queryStatus = "all"
+
+    ordersData = []
+    for order in orders:
+        orderItems = []
+        for item in order["order_items"]:
+            item_id = item["item_id"]
+            item_isreturnable = item["item_isreturnable"]
+            items = list(db.products.find({"product_id": item_id}))
+            item_name = items[0]["product_name"]
+            item_img = items[0]["product_image"]
+            orderItems.append({
+               "item_id": item_id,
+               "item_name": item_name,
+               "item_qty": item["item_qty"],
+               "item_price": item["item_price"],
+               "item_img": item_img,
+               "item_isreturnable": item_isreturnable
+            })
+        order_id = order["order_id"]
+        order_delivery_type = order["order_delivery_type"]
+        order_payment_method = order["payment_method"]
+        order_date = order["order_date"]
+        order_total = order["order_total"]
+        order_isreturnable = order["order_isreturnable"]
+        order_status = order["order_status"]
+        order_return_status = order["order_return_status"]
+        ordered_by = order["ordered_by"]
+        tracking_data = getTrackingData(order_delivery_type, order_status)
+        return_tracking_data = getReturnTrackingData(order_return_status)
+        order_refund_amount = 0
+        if order_return_status > 0:
+            allReturns = list(db.returns.find({"original_order_id": order_id}))
+            if len(allReturns) == 1:
+                return_order = allReturns[0]
+                order_refund_amount = return_order["return_total"]
+
+        ordersData.append({"order_id": order_id, "orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "ordered_by": ordered_by, "order_isreturnable": order_isreturnable, "order_status": order_status, "order_return_status": order_return_status, "tracking_data": tracking_data, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
+    return render_template("orders_all.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0, totItems=0, filterOption=queryStatus)
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True) #port > 1024
