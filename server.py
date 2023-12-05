@@ -765,5 +765,26 @@ def orders_all():
         ordersData.append({"order_id": order_id, "orderItems": orderItems, "order_delivery_type": order_delivery_type, "order_payment_method": order_payment_method, "order_date": order_date, "order_total": order_total, "ordered_by": ordered_by, "order_isreturnable": order_isreturnable, "order_status": order_status, "order_return_status": order_return_status, "tracking_data": tracking_data, "return_tracking_data": return_tracking_data, "order_refund_amount": order_refund_amount})
     return render_template("orders_all.html", ordersData=ordersData, ordersLen=len(ordersData), shopLen=0, shoppingCart=[], total=0, totItems=0, filterOption=queryStatus)
 
+@app.route("/add-products-view/")
+def add_products_view():
+    categories = list(db.categories.find({}))
+    categories.insert(0, None)
+    categories.append({"category_name": "Not found"})
+    categoriesLen = len(categories)
+
+    db_products = list(db.products.find({}))
+    products = [product["product_name"] for product in db_products]
+    print(products)
+    return render_template("add_products.html", shopLen = 0, shoppingCart=[], total=0, totItems=0, categories=categories, categoriesLen=categoriesLen, products=",".join(products))
+
+@app.route("/add-product")
+def add_product():
+    product_name = request.args.get("product_name")
+    product_category = request.args.get("product_category")
+    product_price = request.args.get("product_price")
+    print(product_name, product_category, product_price)
+    return add_products_view()
+
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True) #port > 1024

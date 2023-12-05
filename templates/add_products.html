@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+Grocery Store - Home
+{% endblock %}
+
+{% block body %}
+<!-- Main Store Body -->
+
+<div class="container" style="margin-bottom: 50px;">
+  <h3>Add Product</h3>
+  <form class="form" action="/add-product" method="GET" enctype="multipart/form-data">
+    <div style="display: flex; flex-direction: column; width: 300px;">
+      <input style="margin-bottom: 2.5px;" type="text" name="product_name" placeholder="Product name" oninput="checkFields('{{products}}')" />
+      <div id="categories" style="margin-right: 25px;">
+        <select id="categorySelect" name="product_category" onchange="onCategorySelect()" style="height: 36px; min-width: 100px;">
+          {% for i in range(categoriesLen) %}
+            {% if i == 0 %}
+              <option value="">Select Category</option>
+            {% else %}
+              <option value="{{categories[i]["category_name"]}}">{{categories[i]["category_name"]}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <input style="margin-bottom: 2.5px;" type="text" name="product_price" placeholder="Price" oninput="checkFields('{{products}}')" />
+    </div>
+    <div>
+      <button disabled type="submit" id="addProductButton" class="btn btn-primary" data-dismiss="modal">Add product</button>
+    </div>
+  </form>
+</div>
+</main>
+<script>
+  // Function to check if all input fields are filled
+    function checkFields(products) {
+      existingProducts = products.split(",")
+      var inputs = document.querySelectorAll('input[type="text"]');
+      var addProductButton = document.getElementById('addProductButton');
+
+      // Check if all input fields are not empty
+      var allFilled = Array.from(inputs).every(function(input) {
+        return input.value.trim() !== '';
+      });
+
+      // Check if product_name already exists
+      var productInput;
+      var inputFields = Array.from(inputs).every(function(input) {
+        if (input["name"] == "product_name") {
+          productInput = input;
+        } 
+      })
+
+      var productNameExists = false;
+
+      if ((productInput.value.trim() !== '') && (existingProducts.indexOf(productInput.value.trim()) !== -1)) {
+        productNameExists = true;
+      }
+
+      // Enable/disable the confirm button based on the result
+      addProductButton.disabled = !allFilled || productNameExists;
+    } 
+</script>
+</body>
+
+{% endblock %}
