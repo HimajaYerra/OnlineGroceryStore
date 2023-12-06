@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Grocery Store - Home
+{% endblock %}
+
+{% block body %}
+<!-- Main Store Body -->
+
+<div class="container" style="margin-bottom: 50px;">
+  <h3>Add Category</h3>
+  <form class="form" action="/add-category" method="GET" enctype="multipart/form-data">
+    <div style="display: flex; flex-direction: column; width: 300px;">
+      <input style="margin-bottom: 2.5px;" type="text" name="category_name" placeholder="Category name" oninput="checkFields('{{categories}}')" />
+      <div style="margin-right: 10px; margin-top: 5px;">
+        Returnable?
+        <label>
+          <input type="radio" name="isreturnable" value="yes" onchange="handleRadioButtonChange(this)"><b> Yes</b> 
+        </label>
+        <label>
+          <input type="radio" name="isreturnable" value="no" checked onchange="handleRadioButtonChange(this)"><b> No</b>
+        </label>
+      </div> 
+      <div style="display: flex; margin-top: 25px;">
+        <button disabled type="submit" id="addCategoryButton" class="btn btn-primary" data-dismiss="modal">Add category</button>
+      </div>
+    </div>
+  </form>
+</div>
+</main>
+<script>
+
+  // Function to handle radio button changes
+    function handleRadioButtonChange(radio) {
+      // Get all radio buttons in the same group
+      var radioButtons = document.getElementsByName(radio.name);
+      // Iterate through the radio buttons
+      radioButtons.forEach(function (currentRadio) {
+        // Get the div associated with the radio button
+        var associatedDiv = document.getElementById(currentRadio.value);
+
+        // Toggle the visibility of the div based on radio button state
+        if (currentRadio.checked) {
+          associatedDiv.style.display = 'block';
+        } else {
+          associatedDiv.style.display = 'none';
+        }
+      });
+    }
+
+  // Function to check if all input fields are filled
+    function checkFields(categories) {
+      existingCategories = categories.split(",")
+      var inputs = document.querySelectorAll('input[type="text"]');
+      var addCategoryButton = document.getElementById('addCategoryButton');
+
+      // Check if product_name already exists
+      var categoryInput;
+      var inputFields = Array.from(inputs).every(function(input) {
+        if (input["name"] == "category_name") {
+          categoryInput = input;
+        } 
+      })
+
+      var categoryNameExists = false;
+
+      if ((categoryInput.value.trim() !== '') && (existingCategories.indexOf(categoryInput.value.trim()) !== -1)) {
+        categoryNameExists = true;
+      }
+
+      addCategoryButton.disabled = categoryNameExists;
+    } 
+
+</script>
+</body>
+
+{% endblock %}

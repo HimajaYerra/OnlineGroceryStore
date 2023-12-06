@@ -12,8 +12,8 @@ Grocery Store - Home
   <form class="form" action="/add-product" method="GET" enctype="multipart/form-data">
     <div style="display: flex; flex-direction: column; width: 300px;">
       <input style="margin-bottom: 2.5px;" type="text" name="product_name" placeholder="Product name" oninput="checkFields('{{products}}')" />
-      <div id="categories" style="margin-right: 25px;">
-        <select id="categorySelect" name="product_category" onchange="onCategorySelect()" style="height: 36px; min-width: 100px;">
+      <div id="categories" style="margin-bottom: 2.5px;">
+        <select id="categorySelect" name="product_category" onchange="checkFields('{{products}}')" style="height: 26px; width: 100%;">
           {% for i in range(categoriesLen) %}
             {% if i == 0 %}
               <option value="">Select Category</option>
@@ -23,10 +23,14 @@ Grocery Store - Home
           {% endfor %}
         </select>
       </div>
-      <input style="margin-bottom: 2.5px;" type="text" name="product_price" placeholder="Price" oninput="checkFields('{{products}}')" />
-    </div>
-    <div>
-      <button disabled type="submit" id="addProductButton" class="btn btn-primary" data-dismiss="modal">Add product</button>
+      <input style="margin-bottom: 2.5px;" type="number" step="0.01" min="0" value="0" name="product_price" placeholder="Price" oninput="checkFields('{{products}}')" />
+      <div style="display: flex; flex-direction: column; width: 100%;">
+        <label for="fileInput">Upload picture</label>
+        <input type="file" id="fileInput" name="product_picture" placeholder="load picture" />
+      </div>
+      <div style="display: flex; margin-top: 25px;">
+        <button disabled type="submit" id="addProductButton" class="btn btn-primary" data-dismiss="modal">Add product</button>
+      </div>
     </div>
   </form>
 </div>
@@ -39,9 +43,11 @@ Grocery Store - Home
       var addProductButton = document.getElementById('addProductButton');
 
       // Check if all input fields are not empty
-      var allFilled = Array.from(inputs).every(function(input) {
-        return input.value.trim() !== '';
-      });
+      //var allFilled = Array.from(inputs).every(function(input) {
+      //  if (input["name"] == "product_name") {
+      //    return input.value.trim() !== '';
+      //  }
+      //});
 
       // Check if product_name already exists
       var productInput;
@@ -57,9 +63,17 @@ Grocery Store - Home
         productNameExists = true;
       }
 
+      var selectedOption = document.getElementById("categorySelect").value;
+      var categorySelected = true;
+      if (selectedOption === "") {
+        categorySelected = false;
+      }
+
       // Enable/disable the confirm button based on the result
-      addProductButton.disabled = !allFilled || productNameExists;
+      //addProductButton.disabled = !allFilled || productNameExists || !categorySelected;
+      addProductButton.disabled = productNameExists || !categorySelected;
     } 
+
 </script>
 </body>
 

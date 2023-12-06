@@ -116,7 +116,8 @@
           <li class="nav-item"><a href="/orders/" class="nav-link">View Orders</a></li>
         {% else %}
           <li class="nav-item"><a href="/orders-all/" class="nav-link">View Orders</a></li>
-          <li class="nav-item"><a href="/add-products-view/" class="nav-link">Add Products</a></li>
+          <li class="nav-item"><a href="/add-products-view/" class="nav-link">Add Product</a></li>
+          <li class="nav-item"><a href="/add-category-view/" class="nav-link">Add Category</a></li>
         {% endif %}
         <li class="nav-item dropdown" style="display: none;">
           <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
@@ -142,7 +143,7 @@
       {% endif %}
       </ul>
       <div>
-        {% if session['uid'] != 1 %}
+        {% if 'uid' in session and session['uid'] != 1 %}
         <button class="navbar-toggler" style="display:inline" type="button" data-toggle="modal" data-target="#modalCenter">
           <span class="glyphicon glyphicon-shopping-cart" data-toggle="modal" data-target="">
             <i class="fas fa-shopping-cart"></i>

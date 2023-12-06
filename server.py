@@ -46,34 +46,42 @@ except:
 ###Registration Page####
 @app.route("/register", methods=["GET"])
 def registration():
-    return render_template("registration.html")
+    return render_template("registration.html", shopLen=0, shoppingCart=[], total=0, totItems=0)
 
 ####registered##
 
 @app.route("/registered/", methods=["POST"] )
 def registered():
+    allCustomers = db.customers.find({})
+    maxExistingUid = 0
+    for customer in allCustomers:
+        if "uid" in customer:
+            maxExistingUid = max(int(customer["uid"]), maxExistingUid)
+    uid = maxExistingUid + 1
     firstname=request.form.get('firstname')
     lastname=request.form.get('lastname')
     email=request.form.get('emailid')
     dob=request.form.get('dob')
     address=request.form.get('address')
-    cardtype=request.form.get('cardtype')
-    nameoncard=request.form.get('nameoncard')
-    cardnumber=request.form.get('cardnumber')
-    expirydate=request.form.get('expiry-date')
-    postcode=request.form.get('postcode')
+    #cardtype=request.form.get('cardtype')
+    #nameoncard=request.form.get('nameoncard')
+    #cardnumber=request.form.get('cardnumber')
+    #expirydate=request.form.get('expiry-date')
+    #postcode=request.form.get('postcode')
     user=request.form.get('username')
     pword=request.form.get('password')
     pword_rep=request.form.get('psw-repeat')
     if (pword==pword_rep):
-     db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
-                              'address':address,'card_type':cardtype, 'name_on_card':nameoncard, 'expity_date':expirydate,'postcode':postcode,
-                              'username':user, 'password':pword})     
-     return render_template('login.html')
+        #db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
+        #                      'address':address,'card_type':cardtype, 'name_on_card':nameoncard, 'expity_date':expirydate,'postcode':postcode,
+        #                      'username':user, 'password':pword, 'uid': uid})     
+        db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
+                              'address':address, 'username':user, 'password':pword, 'uid': uid})     
+        return render_template('login.html')
     else:
         messages='Password and Repeat Password is not the same!!'
     flash(messages)
-    return render_template('registration.html')
+    return render_template("registration.html", shopLen=0, shoppingCart=[], total=0, totItems=0)
 
 ##############
 def getTrackingData(order_delivery_type, curr_status=1):
@@ -137,7 +145,7 @@ def logged():
     if (len(rows) == 1):
         adminLogin = True
     else:
-        rows = list(db.users.find({"username": user, "password": pwd}))
+        rows = list(db.customers.find({"username": user, "password": pwd}))
 
     # If username and password match a record in database, set session variables
     if len(rows) == 1:
@@ -193,14 +201,14 @@ def order_update():
        total += shoppingCart[i]["subTotal"]
        totItems += shoppingCart[i]["qty"]
     
-    usersList = list(db.users.find({}))
+    usersList = list(db.customers.find({}))
     usersLen = len(usersList)
 
     return render_template ( "order_update.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, usersList=usersList, usersLen=usersLen, preselected_uid=2, ordersData=[], orderUser="", ordersLen=-1)
 
 @app.route('/fetch_order_history/',methods=["GET"])
 def fetch_order_history(uidInput=None):
-    usersList = list(db.users.find({}))
+    usersList = list(db.customers.find({}))
     usersLen = len(usersList)
     uid = uidInput if uidInput != None else int(request.args.get('selectedUser'))
     preselected_uid = -1 
@@ -781,10 +789,44 @@ def add_products_view():
 def add_product():
     product_name = request.args.get("product_name")
     product_category = request.args.get("product_category")
-    product_price = request.args.get("product_price")
-    print(product_name, product_category, product_price)
+    product_price = int(request.args.get("product_price"))
+    product_picture = request.args.get("product_picture")
+    allProducts = db.products.find({})
+    maxExistingProductId = 0
+    for product in allProducts:
+        if "product_id" in product:
+            maxExistingProductId = max(int(product["product_id"]), maxExistingProductId)
+
+    product_id = maxExistingProductId + 1 
+    ret = db.products.insert_one({"product_id": product_id, "product_name": product_name, "product_image": product_picture, "category": product_category, "price": product_price, "isavailable": True})
+    if not ret.acknowledged:
+        print("Error: Failed to insert into products collection")
+    
     return add_products_view()
 
+@app.route("/add-category-view/")
+def add_category_view():
+    db_categories = list(db.categories.find({}))
+    categories = [category["category_name"] for category in db_categories]
+
+    return render_template("add_category.html", shopLen = 0, shoppingCart=[], total=0, totItems=0, categories=",".join(categories))
+
+@app.route("/add-category")
+def add_category():
+    category_name = request.args.get("category_name")
+    isreturnable = True if request.args.get("isreturnable") == "Yes" else False
+    allCategories = db.categories.find({})
+    maxExistingCategoryId = 0
+    for category in allCategories:
+        if "category_id" in category:
+            maxExistingCategoryId = max(int(category["category_id"]), maxExistingCategoryId)
+
+    category_id = maxExistingCategoryId + 1 
+    ret = db.categories.insert_one({"category_id": category_id, "category_name": category_name, "isreturnable": isreturnable})
+    if not ret.acknowledged:
+        print("Error: Failed to insert into categories collection")
+    
+    return add_category_view()
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True) #port > 1024
