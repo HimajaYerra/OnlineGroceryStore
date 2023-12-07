@@ -53,11 +53,16 @@ def registration():
 @app.route("/registered/", methods=["POST"] )
 def registered():
     allCustomers = db.customers.find({})
-    maxExistingUid = 0
-    for customer in allCustomers:
-        if "uid" in customer:
-            maxExistingUid = max(int(customer["uid"]), maxExistingUid)
-    uid = maxExistingUid + 1
+    # uid = 1 is reserved for admin only
+    uid = 0
+    if len(allCustomers) == 0:
+        uid = 2 
+    else:
+        maxExistingUid = 0
+        for customer in allCustomers:
+            if "uid" in customer:
+                maxExistingUid = max(int(customer["uid"]), maxExistingUid)
+        uid = maxExistingUid + 1
     firstname=request.form.get('firstname')
     lastname=request.form.get('lastname')
     email=request.form.get('emailid')

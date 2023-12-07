@@ -19,68 +19,77 @@ Grocery Store - Home
     <div id="ordersData">
       {% for i in range(ordersLen) %}
         
-        <div class="container" style="margin-bottom: 50px;">
+        <div class="container" style="margin-bottom: 50px; background-color: #dbc8db; border: 1px solid; padding-bottom: 10px;">
           <h3>Order #{{i+1}}</h3>
-          <div style="display:flex; align-items: center; justify-content: space-between; border: 1px solid #d2d2d2; margin-bottom: 5px;">
-            {% for j in range(ordersData[i]["tracking_data"]|length) %}
-            <label style="max-width: 70px;" for="{{ordersData[i]["tracking_data"][j]["status_name"]}}"><b>{{ordersData[i]["tracking_data"][j]["status_name"]}}</b></label>
-            {% if j != ordersData[i]["tracking_data"]|length - 1 %}
-            <progress style="width: 120px; accent-color: orangered;" id="{{ordersData[i]["tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["tracking_data"][j]["status_value"]}}</progress>
-            {% endif %}
-            {% endfor %}
+          <div style="border: 1px solid; padding: 5px;">
+            <div><b>Order status:</b></div>
+            <div style="display:flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+              {% for j in range(ordersData[i]["tracking_data"]|length) %}
+              <label style="max-width: 70px;" for="{{ordersData[i]["tracking_data"][j]["status_name"]}}">{{ordersData[i]["tracking_data"][j]["status_name"]}}</label>
+              {% if j != ordersData[i]["tracking_data"]|length - 1 %}
+              <progress style="width: 120px; accent-color: orangered;" id="{{ordersData[i]["tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["tracking_data"][j]["status_value"]}}</progress>
+              {% endif %}
+              {% endfor %}
+            </div>
           </div>
           {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] > 0 %}
-          <div style="display:flex; align-items: center; justify-content: space-between; border: 1px solid #d2d2d2; margin-bottom: 5px;">
-            {% for j in range(ordersData[i]["return_tracking_data"]|length) %}
-            <label style="max-width: 70px;" for="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}"><b>{{ordersData[i]["return_tracking_data"][j]["status_name"]}}</b></label>
-            {% if j != ordersData[i]["return_tracking_data"]|length - 1 %}
-            <progress style="width: 120px; accent-color: orangered;" id="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["return_tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["return_tracking_data"][j]["status_value"]}}</progress>
-            {% endif %}
-            {% endfor %}
+          <div style="border: 1px solid; padding: 5px; margin-top: 5px;">
+            <div><b>Return status:</b></div>
+            <div style="display:flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+              {% for j in range(ordersData[i]["return_tracking_data"]|length) %}
+              <label style="max-width: 70px;" for="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}">{{ordersData[i]["return_tracking_data"][j]["status_name"]}}</label>
+              {% if j != ordersData[i]["return_tracking_data"]|length - 1 %}
+              <progress style="width: 120px; accent-color: orangered;" id="{{ordersData[i]["return_tracking_data"][j]["status_name"]}}" value="{{ordersData[i]["return_tracking_data"][j]["status_value"]}}" max="100">{{ordersData[i]["return_tracking_data"][j]["status_value"]}}</progress>
+              {% endif %}
+              {% endfor %}
+            </div>
           </div>
           {% endif %}
-          <div class="row">
-            <div class="col-sm">
-              <div style="display: flex; justify-content: space-between;">
-                <table class="table table-sm" style="margin-right: 2.5px; width: 60%; border: 1px solid #d2d2d2">
-                  <tbody>
-                    {% for j in range(ordersData[i]["orderItems"]|length) %}
-                    <tr>
-                      <td style="width: 30%;"><img src="/static/img/{{ ordersData[i]["orderItems"][j]["item_img"] }}" style="height: 100px; width: 100px;" /></td>
-                      <td style="display: flex; flex-direction: column; align-items: flex-start; padding-left: 100px;">
-                          <div><b>{{ordersData[i]["orderItems"][j]["item_name"]}}</b></div>
-                          <div><b>Qty: </b>{{ordersData[i]["orderItems"][j]["item_qty"]}}</div>
-                          <div><b>Price: </b>{{'${:,.2f}'.format(ordersData[i]["orderItems"][j]["item_price"])}}</div>
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-                <table class="table table-sm" style="margin-left: 2.5px; width: 40%; border: 1px solid #d2d2d2">
-                  <tbody>
-                    <tr>
-                      <td style="display: flex; flex-direction: column; align-items: flex-start;">
-                          <div><b>Total price: </b>{{'${:,.2f}'.format(ordersData[i]["order_total"])}}</div>
-                          <div><b>Delivery type: </b>{{ordersData[i]["order_delivery_type"]}}</div>
-                          <div><b>Payment mode: </b>{{ordersData[i]["order_payment_method"]}}</div>
-                          <div><b>Order date: </b>{{ordersData[i]["order_date"]}}</div>
-                      </td>
-                    </tr>
-                    {% if ordersData[i]["order_refund_amount"] > 0 %}
-                    <tr>
-                      <td style="display: flex; flex-direction: column; align-items: flex-start;">
-                        <div><b>Refund amount: </b>{{'${:,.2f}'.format(ordersData[i]["order_refund_amount"])}}</div>
-                      </td>
-                    </tr>
-                    {% endif %}
-                  </tbody>
-                </table>
+          <div style="border: 1px solid; padding: 5px; margin-top: 5px;">
+            <div><b>Order details:</b></div>
+            <div class="row">
+              <div class="col-sm">
+                <div style="display: flex; justify-content: space-between;">
+                  <table class="table table-sm" style="margin-right: 2.5px; width: 60%;">
+                    <tbody>
+                      {% for j in range(ordersData[i]["orderItems"]|length) %}
+                      <tr>
+                        <td style="width: 30%;"><img src="/static/img/{{ ordersData[i]["orderItems"][j]["item_img"] }}" style="height: 100px; width: 100px;" /></td>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start; padding-left: 100px;">
+                            <div><b>{{ordersData[i]["orderItems"][j]["item_name"]}}</b></div>
+                            <div><b>Qty: </b>{{ordersData[i]["orderItems"][j]["item_qty"]}}</div>
+                            <div><b>Price: </b>{{'${:,.2f}'.format(ordersData[i]["orderItems"][j]["item_price"])}}</div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <table class="table table-sm" style="margin-left: 2.5px; width: 40%;">
+                    <tbody>
+                      <tr>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <div><b>Total price: </b>{{'${:,.2f}'.format(ordersData[i]["order_total"])}}</div>
+                            <div><b>Delivery type: </b>{{ordersData[i]["order_delivery_type"]}}</div>
+                            <div><b>Payment mode: </b>{{ordersData[i]["order_payment_method"]}}</div>
+                            <div><b>Order date: </b>{{ordersData[i]["order_date"]}}</div>
+                        </td>
+                      </tr>
+                      {% if ordersData[i]["order_refund_amount"] > 0 %}
+                      <tr>
+                        <td style="display: flex; flex-direction: column; align-items: flex-start;">
+                          <div><b>Refund amount: </b>{{'${:,.2f}'.format(ordersData[i]["order_refund_amount"])}}</div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
           {% if ordersData[i]["order_isreturnable"] %}
             {% if ordersData[i]["order_status"] == 5 and ordersData[i]["order_return_status"] == 0 %}
-              <a href="/return?order_id={{ordersData[i]["order_id"]}}&uid={{uid}}" style="display: flex; justify-content: flex-end;"><button class="btn btn-primary" data-dismiss="modal">Start return</button></a>
+              <a href="/return?order_id={{ordersData[i]["order_id"]}}&uid={{uid}}" style="display: flex; justify-content: flex-end; position: relative; top: 5px;"><button class="btn btn-primary" data-dismiss="modal">Start return</button></a>
             {% endif %}
           {% endif %}
         </div>
