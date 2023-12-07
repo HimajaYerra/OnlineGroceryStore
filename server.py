@@ -52,7 +52,7 @@ def registration():
 
 @app.route("/registered/", methods=["POST"] )
 def registered():
-    allCustomers = db.customers.find({})
+    allCustomers = list(db.customers.find({}))
     # uid = 1 is reserved for admin only
     uid = 0
     if len(allCustomers) == 0:
@@ -67,7 +67,8 @@ def registered():
     lastname=request.form.get('lastname')
     email=request.form.get('emailid')
     dob=request.form.get('dob')
-    address=request.form.get('address')
+    address1=request.form.get('address1')
+    address2=request.form.get('address2')
     #cardtype=request.form.get('cardtype')
     #nameoncard=request.form.get('nameoncard')
     #cardnumber=request.form.get('cardnumber')
@@ -80,8 +81,8 @@ def registered():
         #db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
         #                      'address':address,'card_type':cardtype, 'name_on_card':nameoncard, 'expity_date':expirydate,'postcode':postcode,
         #                      'username':user, 'password':pword, 'uid': uid})     
-        db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'emailid':email, 'dob':dob,
-                              'address':address, 'username':user, 'password':pword, 'uid': uid})     
+        db.customers.insert_one({'firstname':firstname, 'lastname':lastname, 'username':email, 'dob':dob,
+                              'address1':address1, 'address2':address2, 'password':pword, 'uid': uid})     
         return render_template('login.html')
     else:
         messages='Password and Repeat Password is not the same!!'
@@ -138,13 +139,6 @@ def logged():
     # Make sure form input is not blank and re-render log in page if blank
     if user == "" or pwd == "":
         return render_template ( "login.html" )
-    # Find out if info in form matches a record in user database
-    #query = "SELECT * FROM users WHERE username = :user AND password = :pwd"
-
-     #rows = list(db.customers.find({"username":user,"password":pwd}))
-    #   print(rows)
-
-
     adminLogin = False
     rows = list(db.admin.find({"username":user,"password":pwd}))
     if (len(rows) == 1):
@@ -180,16 +174,11 @@ def index():
     if session and "uid" in session and session["uid"] in shoppingHash:
        shoppingCart = shoppingHash[session["uid"]]
     shopLen = len(shoppingCart)
-
-   # print("here", shoppingCart, shoppingHash)
-    #print("Here")
-
-
     totItems, total, display = 0, 0, 0
     for i in range(shopLen):
        total += shoppingCart[i]["subTotal"]
        totItems += shoppingCart[i]["qty"]
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
+    return render_template ( "index.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
 
   
 
@@ -434,23 +423,19 @@ def buy():
         
         shoppingHash[uid] = shoppingCart
         
-        # Insert selected shirt into shopping cart
-        # Rebuild shopping cart
+  
         shopLen = len(shoppingCart)
         for i in range(shopLen):
             total += shoppingCart[i]["subTotal"]
             totItems += shoppingCart[i]["qty"]
-        # Select all shirts for home page view
-        #shirts = db.execute("SELECT * FROM shirts ORDER BY samplename ASC")
+     
         products = list(db.products.find({}))
         productsLen = len(products)
-        # Go back to home page
-        #return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, session=session )
-        return render_template ("index2.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, filterOption=filterOption )
+        return render_template ("index.html", shoppingCart=shoppingCart, products=products, shopLen=shopLen, productsLen=productsLen, total=total, totItems=totItems, display=display, filterOption=filterOption )
 
 @app.route("/filter/")
 def filter():
-    filterOption = "all";
+    filterOption = "all"
     products = []
     productsLen = 0
     if request.args.get('category'):
@@ -473,7 +458,7 @@ def filter():
            totItems += item["qty"]
     shopLen = len(shoppingCart)
     display = 0
-    return render_template ( "index2.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
+    return render_template ( "index.html", products=products, shoppingCart=shoppingCart, productsLen=productsLen, shopLen=shopLen, total=total, totItems=totItems, display=display, filterOption=filterOption)
 
 @app.route("/checkout/")
 def checkout():
@@ -657,7 +642,7 @@ def payment():
             mode='payment',
             success_url='http://localhost:5000/order/success?uid='+str(uid),
             
-            cancel_url='http://localhost:5000/shop',
+            #cancel_url='http://localhost:5000/shop'
         )
 
         # Insert the order into orders collection if payment is successful
@@ -834,4 +819,4 @@ def add_category():
     return add_category_view()
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True) #port > 1024
+    app.run(port=5000, debug=True) 
