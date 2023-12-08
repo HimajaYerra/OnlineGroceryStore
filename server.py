@@ -791,7 +791,7 @@ def add_product():
     ret = db.products.insert_one({"product_id": product_id, "product_name": product_name, "product_image": product_picture, "category": product_category, "price": product_price, "isavailable": True})
     if not ret.acknowledged:
         print("Error: Failed to insert into products collection")
-    
+    flash("Product added successfully!")
     return add_products_view()
 
 @app.route("/add-category-view/")
@@ -815,7 +815,7 @@ def add_category():
     ret = db.categories.insert_one({"category_id": category_id, "category_name": category_name, "isreturnable": isreturnable})
     if not ret.acknowledged:
         print("Error: Failed to insert into categories collection")
-    
+    flash("Category added successfully!")
     return add_category_view()
 
 if __name__ == '__main__':

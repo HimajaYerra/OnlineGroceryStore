@@ -6,7 +6,22 @@ Grocery Store - Home
 
 {% block body %}
 <!-- Main Store Body -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+   
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+        <strong>{{ message }}</strong> 
+    </div>
 
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
 <div class="container" style="margin-bottom: 50px;">
   <h3>Add Product</h3>
   <form class="form" action="/add-product" method="GET" enctype="multipart/form-data">
